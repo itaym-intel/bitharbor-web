@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import {
   Box,
   Typography,
@@ -21,6 +21,7 @@ import { jellyfinApi } from '@/lib/jellyfin/api';
 export function ItemDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // Fetch the item by ID
   const { data: item, isLoading } = useQuery({
@@ -28,6 +29,26 @@ export function ItemDetail() {
     queryFn: () => jellyfinApi.getItemById(id!),
     enabled: !!id,
   });
+
+  // Mutation for toggling favorite
+  const toggleFavoriteMutation = useMutation({
+    mutationFn: async () => {
+      if (!item) return false;
+      return jellyfinApi.toggleFavorite(item.Id, item.UserData?.IsFavorite || false);
+    },
+    onSuccess: () => {
+      // Invalidate queries to refetch data
+      queryClient.invalidateQueries({ queryKey: ['item', id] });
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      queryClient.invalidateQueries({ queryKey: ['continueWatching'] });
+      queryClient.invalidateQueries({ queryKey: ['recentlyAdded'] });
+      queryClient.invalidateQueries({ queryKey: ['libraryItems'] });
+    },
+  });
+
+  const handleToggleFavorite = () => {
+    toggleFavoriteMutation.mutate();
+  };
 
   if (isLoading || !item) {
     return (
@@ -119,7 +140,8 @@ export function ItemDetail() {
                   border: 1,
                   borderColor: 'divider',
                 }}
-                onClick={() => console.log('Toggle favorite:', item.Name)}
+                onClick={handleToggleFavorite}
+                disabled={toggleFavoriteMutation.isPending}
               >
                 {item.UserData?.IsFavorite ? (
                   <FavoriteIcon color="error" />

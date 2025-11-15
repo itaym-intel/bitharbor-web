@@ -17,13 +17,20 @@ export function Home() {
     queryFn: () => jellyfinApi.getRecentlyAdded(),
   });
 
+  const { data: favorites, isLoading: loadingFavorites } = useQuery({
+    queryKey: ['favorites'],
+    queryFn: () => jellyfinApi.getFavorites(),
+  });
+
   const handleItemClick = (item: any) => {
     navigate(`/item/${item.Id}`);
   };
 
+  const isLoading = loadingContinue || loadingRecent || loadingFavorites;
+
   return (
     <Box>
-      {loadingContinue || loadingRecent ? (
+      {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
           <CircularProgress />
         </Box>
@@ -40,6 +47,13 @@ export function Home() {
             <MediaRow
               title="Recently Added"
               items={recentlyAdded}
+              onItemClick={handleItemClick}
+            />
+          )}
+          {favorites && favorites.length > 0 && (
+            <MediaRow
+              title="Favorites"
+              items={favorites}
               onItemClick={handleItemClick}
             />
           )}

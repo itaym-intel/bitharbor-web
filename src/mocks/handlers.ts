@@ -5,6 +5,7 @@ import {
   mockLibraries,
   mockContinueWatching,
   mockRecentlyAdded,
+  mockFavorites,
   mockMovieLibraryItems,
   mockTVShowLibraryItems,
   mockMusicLibraryItems,
@@ -61,9 +62,21 @@ export const handlers = [
     return HttpResponse.json(mockRecentlyAdded);
   }),
 
-  // Get library items with filtering and sorting
+  // Get favorite items
   http.get(`${MOCK_SERVER_URL}/Users/:userId/Items`, ({ request }) => {
     const url = new URL(request.url);
+    const filters = url.searchParams.get('Filters');
+    
+    // Check if this is a favorites request
+    if (filters && filters.includes('IsFavorite')) {
+      console.log('⭐ [MSW] Favorites request intercepted');
+      return HttpResponse.json({
+        Items: mockFavorites,
+        TotalRecordCount: mockFavorites.length,
+      });
+    }
+    
+    // Otherwise handle as regular library items request
     const parentId = url.searchParams.get('ParentId');
     const sortBy = url.searchParams.get('SortBy') || 'SortName';
     const sortOrder = url.searchParams.get('SortOrder') || 'Ascending';
@@ -132,6 +145,7 @@ export const handlers = [
     const allItems = [
       ...mockContinueWatching,
       ...mockRecentlyAdded,
+      ...mockFavorites,
       ...mockMovieLibraryItems,
       ...mockTVShowLibraryItems,
       ...mockMusicLibraryItems,
@@ -149,6 +163,60 @@ export const handlers = [
       { error: 'Item not found' },
       { status: 404 }
     );
+  }),
+
+  // Mark item as favorite
+  http.post(`${MOCK_SERVER_URL}/Users/:userId/FavoriteItems/:itemId`, ({ params }) => {
+    const { itemId } = params;
+    console.log('⭐ [MSW] Marking item as favorite:', itemId);
+    
+    // Find and update the item across all collections
+    const allCollections = [
+      mockContinueWatching,
+      mockRecentlyAdded,
+      mockFavorites,
+      mockMovieLibraryItems,
+      mockTVShowLibraryItems,
+      mockMusicLibraryItems,
+    ];
+    
+    for (const collection of allCollections) {
+      const item = collection.find((i: any) => i.Id === itemId);
+      if (item && item.UserData) {
+        item.UserData.IsFavorite = true;
+        console.log('✅ [MSW] Item marked as favorite:', item.Name);
+        break;
+      }
+    }
+    
+    return HttpResponse.json({ success: true }, { status: 200 });
+  }),
+
+  // Remove item from favorites
+  http.delete(`${MOCK_SERVER_URL}/Users/:userId/FavoriteItems/:itemId`, ({ params }) => {
+    const { itemId } = params;
+    console.log('💔 [MSW] Removing item from favorites:', itemId);
+    
+    // Find and update the item across all collections
+    const allCollections = [
+      mockContinueWatching,
+      mockRecentlyAdded,
+      mockFavorites,
+      mockMovieLibraryItems,
+      mockTVShowLibraryItems,
+      mockMusicLibraryItems,
+    ];
+    
+    for (const collection of allCollections) {
+      const item = collection.find((i: any) => i.Id === itemId);
+      if (item && item.UserData) {
+        item.UserData.IsFavorite = false;
+        console.log('✅ [MSW] Item removed from favorites:', item.Name);
+        break;
+      }
+    }
+    
+    return HttpResponse.json({ success: true }, { status: 200 });
   }),
 
   // Get system info (for server discovery)
@@ -170,6 +238,7 @@ export const handlers = [
     const allItems = [
       ...mockContinueWatching,
       ...mockRecentlyAdded,
+      ...mockFavorites,
       ...mockMovieLibraryItems,
       ...mockTVShowLibraryItems,
       ...mockMusicLibraryItems,

@@ -12,6 +12,38 @@ export function Libraries() {
     queryFn: () => jellyfinApi.getLibraries(),
   });
 
+  // Fetch item counts for each library
+  const { data: movieCount } = useQuery({
+    queryKey: ['libraryCount', 'mock-library-movies'],
+    queryFn: async () => {
+      const result = await jellyfinApi.getLibraryItems('mock-library-movies', { limit: 1 });
+      return result.totalCount;
+    },
+  });
+
+  const { data: tvCount } = useQuery({
+    queryKey: ['libraryCount', 'mock-library-tvshows'],
+    queryFn: async () => {
+      const result = await jellyfinApi.getLibraryItems('mock-library-tvshows', { limit: 1 });
+      return result.totalCount;
+    },
+  });
+
+  const { data: musicCount } = useQuery({
+    queryKey: ['libraryCount', 'mock-library-music'],
+    queryFn: async () => {
+      const result = await jellyfinApi.getLibraryItems('mock-library-music', { limit: 1 });
+      return result.totalCount;
+    },
+  });
+
+  const getItemCount = (libraryId: string) => {
+    if (libraryId === 'mock-library-movies') return movieCount;
+    if (libraryId === 'mock-library-tvshows') return tvCount;
+    if (libraryId === 'mock-library-music') return musicCount;
+    return undefined;
+  };
+
   if (isLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
@@ -53,6 +85,7 @@ export function Libraries() {
                 <Typography variant="h6">{library.Name}</Typography>
                 <Typography variant="body2" color="text.secondary">
                   {library.CollectionType || 'Mixed'}
+                  {getItemCount(library.Id) !== undefined && ` • ${getItemCount(library.Id)} items`}
                 </Typography>
               </CardContent>
             </Card>

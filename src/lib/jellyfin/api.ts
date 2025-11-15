@@ -62,6 +62,28 @@ export class JellyfinApiService {
     }
   }
 
+  async getFavorites(limit = 12): Promise<MediaItem[]> {
+    try {
+      const userId = this.getUserId();
+      const params = new URLSearchParams({
+        Filters: 'IsFavorite',
+        Recursive: 'true',
+        Limit: limit.toString(),
+        SortBy: 'SortName',
+        SortOrder: 'Ascending',
+      });
+      const url = `${jellyfinClient.getServerUrl()}/Users/${userId}/Items?${params.toString()}`;
+      const response = await fetch(url, {
+        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+      });
+      const data = await response.json();
+      return this.mapItems(data.Items || []);
+    } catch (error) {
+      console.error('Failed to fetch favorites:', error);
+      return [];
+    }
+  }
+
   async getLibraryItems(
     libraryId: string,
     options: {
@@ -124,6 +146,24 @@ export class JellyfinApiService {
     } catch (error) {
       console.error('Failed to fetch item:', error);
       return null;
+    }
+  }
+
+  async toggleFavorite(itemId: string, isFavorite: boolean): Promise<boolean> {
+    try {
+      const userId = this.getUserId();
+      const url = `${jellyfinClient.getServerUrl()}/Users/${userId}/FavoriteItems/${itemId}`;
+      const method = isFavorite ? 'DELETE' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+      });
+      
+      return response.ok;
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+      return false;
     }
   }
 
