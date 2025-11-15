@@ -62,6 +62,51 @@ export class JellyfinApiService {
     }
   }
 
+  async getLibraryItems(
+    libraryId: string,
+    options: {
+      sortBy?: 'SortName' | 'PremiereDate' | 'CommunityRating' | 'DateCreated';
+      sortOrder?: 'Ascending' | 'Descending';
+      genres?: string[];
+      limit?: number;
+      startIndex?: number;
+    } = {}
+  ): Promise<{ items: MediaItem[]; totalCount: number }> {
+    try {
+      const userId = this.getUserId();
+      const params = new URLSearchParams({
+        ParentId: libraryId,
+        IncludeItemTypes: 'Movie,Series,MusicAlbum',
+        Recursive: 'true',
+        Fields: 'PrimaryImageAspectRatio,BasicSyncInfo,ProductionYear',
+        ImageTypeLimit: '1',
+        EnableImageTypes: 'Primary,Backdrop,Thumb',
+      });
+
+      if (options.sortBy) params.append('SortBy', options.sortBy);
+      if (options.sortOrder) params.append('SortOrder', options.sortOrder);
+      if (options.genres && options.genres.length > 0) {
+        params.append('Genres', options.genres.join(','));
+      }
+      if (options.limit) params.append('Limit', options.limit.toString());
+      if (options.startIndex) params.append('StartIndex', options.startIndex.toString());
+
+      const url = `${jellyfinClient.getServerUrl()}/Users/${userId}/Items?${params.toString()}`;
+      const response = await fetch(url, {
+        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+      });
+      const data = await response.json();
+      
+      return {
+        items: this.mapItems(data.Items || []),
+        totalCount: data.TotalRecordCount || 0,
+      };
+    } catch (error) {
+      console.error('Failed to fetch library items:', error);
+      return { items: [], totalCount: 0 };
+    }
+  }
+
   private mapItems(items: any[]): MediaItem[] {
     return items.map(item => ({
       Id: item.Id || '',

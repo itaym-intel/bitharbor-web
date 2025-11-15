@@ -5,6 +5,9 @@ import {
   mockLibraries,
   mockContinueWatching,
   mockRecentlyAdded,
+  mockMovieLibraryItems,
+  mockTVShowLibraryItems,
+  mockMusicLibraryItems,
 } from './data';
 import { generatePosterSVG, generateBackdropSVG } from './images';
 
@@ -17,10 +20,8 @@ export const handlers = [
     const body = await request.json() as any;
     console.log('📝 [MSW] Login attempt:', { username: body.Username, hasPassword: !!body.Pw });
     
-    // Accept any username/password for demo
-    // For stricter testing, use: body.Username === 'demo' && body.Pw === 'demo'
     if (body.Username && body.Pw !== undefined) {
-      console.log('✅ [MSW] Authentication successful');
+      console.log('[MSW] Authentication successful');
       return HttpResponse.json({
         User: mockUser,
         SessionInfo: {
@@ -58,6 +59,69 @@ export const handlers = [
   // Get recently added (latest items)
   http.get(`${MOCK_SERVER_URL}/Users/:userId/Items/Latest`, () => {
     return HttpResponse.json(mockRecentlyAdded);
+  }),
+
+  // Get library items with filtering and sorting
+  http.get(`${MOCK_SERVER_URL}/Users/:userId/Items`, ({ request }) => {
+    const url = new URL(request.url);
+    const parentId = url.searchParams.get('ParentId');
+    const sortBy = url.searchParams.get('SortBy') || 'SortName';
+    const sortOrder = url.searchParams.get('SortOrder') || 'Ascending';
+    const genres = url.searchParams.get('Genres');
+    
+    console.log('📚 [MSW] Library items request:', { parentId, sortBy, sortOrder, genres });
+    
+    // Determine which library
+    let items: any[] = [];
+    if (parentId === 'mock-library-movies') {
+      items = [...mockMovieLibraryItems];
+    } else if (parentId === 'mock-library-tvshows') {
+      items = [...mockTVShowLibraryItems];
+    } else if (parentId === 'mock-library-music') {
+      items = [...mockMusicLibraryItems];
+    } else {
+      // Return all items if no parent specified
+      items = [...mockMovieLibraryItems, ...mockTVShowLibraryItems, ...mockMusicLibraryItems];
+    }
+    
+    // Filter by genre if specified
+    if (genres) {
+      const genreList = genres.split(',');
+      items = items.filter(item => 
+        item.Genres && item.Genres.some((g: string) => genreList.includes(g))
+      );
+    }
+    
+    // Sort items
+    items.sort((a, b) => {
+      let compareResult = 0;
+      
+      switch (sortBy) {
+        case 'SortName':
+          compareResult = a.Name.localeCompare(b.Name);
+          break;
+        case 'PremiereDate':
+        case 'DateCreated':
+          const dateA = new Date(a.PremiereDate || 0).getTime();
+          const dateB = new Date(b.PremiereDate || 0).getTime();
+          compareResult = dateB - dateA; // Newest first by default
+          break;
+        case 'CommunityRating':
+          compareResult = (b.CommunityRating || 0) - (a.CommunityRating || 0);
+          break;
+        default:
+          compareResult = a.Name.localeCompare(b.Name);
+      }
+      
+      return sortOrder === 'Descending' ? -compareResult : compareResult;
+    });
+    
+    console.log(`✅ [MSW] Returning ${items.length} items`);
+    
+    return HttpResponse.json({
+      Items: items,
+      TotalRecordCount: items.length,
+    });
   }),
 
   // Get system info (for server discovery)
