@@ -104,10 +104,10 @@ export const handlers = [
         case 'DateCreated':
           const dateA = new Date(a.PremiereDate || 0).getTime();
           const dateB = new Date(b.PremiereDate || 0).getTime();
-          compareResult = dateB - dateA; // Newest first by default
+          compareResult = dateA - dateB; // Oldest first for Ascending
           break;
         case 'CommunityRating':
-          compareResult = (b.CommunityRating || 0) - (a.CommunityRating || 0);
+          compareResult = (a.CommunityRating || 0) - (b.CommunityRating || 0); // Lowest first for Ascending
           break;
         default:
           compareResult = a.Name.localeCompare(b.Name);
@@ -122,6 +122,33 @@ export const handlers = [
       Items: items,
       TotalRecordCount: items.length,
     });
+  }),
+
+  // Get single item by ID
+  http.get(`${MOCK_SERVER_URL}/Users/:userId/Items/:itemId`, ({ params }) => {
+    const { itemId } = params;
+    console.log('🎬 [MSW] Item detail request:', itemId);
+    
+    const allItems = [
+      ...mockContinueWatching,
+      ...mockRecentlyAdded,
+      ...mockMovieLibraryItems,
+      ...mockTVShowLibraryItems,
+      ...mockMusicLibraryItems,
+    ];
+    
+    const item = allItems.find(i => i.Id === itemId);
+    
+    if (item) {
+      console.log('✅ [MSW] Found item:', item.Name);
+      return HttpResponse.json(item);
+    }
+    
+    console.log('❌ [MSW] Item not found:', itemId);
+    return HttpResponse.json(
+      { error: 'Item not found' },
+      { status: 404 }
+    );
   }),
 
   // Get system info (for server discovery)
@@ -139,8 +166,14 @@ export const handlers = [
   http.get(`${MOCK_SERVER_URL}/Items/:itemId/Images/:imageType`, ({ params }) => {
     const { itemId, imageType } = params;
     
-    // Find the item to get its title and type
-    const allItems = [...mockContinueWatching, ...mockRecentlyAdded];
+    // Find the item to get its title and type - check all item sources
+    const allItems = [
+      ...mockContinueWatching,
+      ...mockRecentlyAdded,
+      ...mockMovieLibraryItems,
+      ...mockTVShowLibraryItems,
+      ...mockMusicLibraryItems,
+    ];
     const item = allItems.find(i => i.Id === itemId);
     
     let svg: string;

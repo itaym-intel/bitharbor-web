@@ -1,9 +1,12 @@
 import { Box, Typography, Grid, Card, CardContent, CardMedia } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { jellyfinApi } from '@/lib/jellyfin/api';
 import { VideoLibrary as VideoLibraryIcon } from '@mui/icons-material';
 
 export function Libraries() {
+  const navigate = useNavigate();
+  
   const { data: libraries, isLoading } = useQuery({
     queryKey: ['libraries'],
     queryFn: () => jellyfinApi.getLibraries(),
@@ -33,7 +36,7 @@ export function Libraries() {
                   transform: 'scale(1.02)',
                 },
               }}
-              onClick={() => console.log('Navigate to library:', library.Name)}
+              onClick={() => navigate(`/library/${library.Id}`)}
             >
               <CardMedia
                 sx={{

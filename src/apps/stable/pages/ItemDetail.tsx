@@ -22,22 +22,14 @@ export function ItemDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // For now, we'll get the item from our existing API calls
-  // In a real app, we'd have a getItemById function
-  const { data: continueWatching } = useQuery({
-    queryKey: ['continueWatching'],
-    queryFn: () => jellyfinApi.getContinueWatching(),
+  // Fetch the item by ID
+  const { data: item, isLoading } = useQuery({
+    queryKey: ['item', id],
+    queryFn: () => jellyfinApi.getItemById(id!),
+    enabled: !!id,
   });
 
-  const { data: recentlyAdded } = useQuery({
-    queryKey: ['recentlyAdded'],
-    queryFn: () => jellyfinApi.getRecentlyAdded(),
-  });
-
-  const allItems = [...(continueWatching || []), ...(recentlyAdded || [])];
-  const item = allItems.find((i) => i.Id === id);
-
-  if (!item) {
+  if (isLoading || !item) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
         <CircularProgress />

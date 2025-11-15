@@ -107,6 +107,26 @@ export class JellyfinApiService {
     }
   }
 
+  async getItemById(itemId: string): Promise<MediaItem | null> {
+    try {
+      const userId = this.getUserId();
+      const url = `${jellyfinClient.getServerUrl()}/Users/${userId}/Items/${itemId}`;
+      const response = await fetch(url, {
+        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+      });
+      
+      if (!response.ok) {
+        return null;
+      }
+      
+      const data = await response.json();
+      return this.mapItems([data])[0];
+    } catch (error) {
+      console.error('Failed to fetch item:', error);
+      return null;
+    }
+  }
+
   private mapItems(items: any[]): MediaItem[] {
     return items.map(item => ({
       Id: item.Id || '',
