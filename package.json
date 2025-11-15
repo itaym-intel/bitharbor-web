@@ -1,0 +1,43 @@
+{
+  "name": "jellyfin-dupe",
+  "version": "0.1.0",
+  "description": "Simplified Jellyfin web client",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@jellyfin/sdk": "^0.0.0-unstable.202510201847",
+    "@mui/icons-material": "^6.4.12",
+    "@mui/material": "^6.4.12",
+    "@tanstack/react-query": "^5.80.10",
+    "hls.js": "^1.6.13",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
+    "@typescript-eslint/eslint-plugin": "^8.35.1",
+    "@typescript-eslint/parser": "^8.35.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.30.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "msw": "^2.12.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.0.7",
+    "vitest": "^3.2.4"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
+}
