@@ -167,6 +167,76 @@ export class JellyfinApiService {
     }
   }
 
+  async reportPlaybackProgress(
+    itemId: string,
+    positionSeconds: number,
+    isPaused: boolean
+  ): Promise<boolean> {
+    try {
+      const positionTicks = Math.floor(positionSeconds * 10000000);
+      const url = `${jellyfinClient.getServerUrl()}/Sessions/Playing/Progress`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-Emby-Token': jellyfinClient.getAccessToken(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ItemId: itemId,
+          PositionTicks: positionTicks,
+          IsPaused: isPaused,
+        }),
+      });
+      
+      return response.ok;
+    } catch (error) {
+      console.error('Failed to report playback progress:', error);
+      return false;
+    }
+  }
+
+  async reportPlaybackStopped(itemId: string, positionSeconds: number): Promise<boolean> {
+    try {
+      const positionTicks = Math.floor(positionSeconds * 10000000);
+      const url = `${jellyfinClient.getServerUrl()}/Sessions/Playing/Stopped`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-Emby-Token': jellyfinClient.getAccessToken(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ItemId: itemId,
+          PositionTicks: positionTicks,
+        }),
+      });
+      
+      return response.ok;
+    } catch (error) {
+      console.error('Failed to report playback stopped:', error);
+      return false;
+    }
+  }
+
+  async markAsPlayed(itemId: string): Promise<boolean> {
+    try {
+      const userId = this.getUserId();
+      const url = `${jellyfinClient.getServerUrl()}/Users/${userId}/PlayedItems/${itemId}`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+      });
+      
+      return response.ok;
+    } catch (error) {
+      console.error('Failed to mark as played:', error);
+      return false;
+    }
+  }
+
   private mapItems(items: any[]): MediaItem[] {
     return items.map(item => ({
       Id: item.Id || '',

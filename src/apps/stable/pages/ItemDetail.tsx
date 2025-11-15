@@ -131,7 +131,7 @@ export function ItemDetail() {
                 variant="contained"
                 size="large"
                 startIcon={<PlayIcon />}
-                onClick={() => console.log('Play:', item.Name)}
+                onClick={() => navigate(`/player/${item.Id}`)}
               >
                 {item.UserData?.PlayedPercentage ? 'Resume' : 'Play'}
               </Button>

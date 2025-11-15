@@ -22,6 +22,8 @@ export function MediaCard({ item, onClick }: MediaCardProps) {
       onClick={onClick}
       sx={{
         width: 200,
+        minWidth: 200,
+        flexShrink: 0,
         cursor: 'pointer',
         transition: 'transform 0.2s',
         position: 'relative',

@@ -261,4 +261,31 @@ export const handlers = [
       headers: { 'Content-Type': 'image/svg+xml' },
     });
   }),
+
+  // Report playback progress
+  http.post(`${MOCK_SERVER_URL}/Sessions/Playing/Progress`, async ({ request }) => {
+    const body = await request.json() as any;
+    console.log('📊 [MSW] Playback progress reported:', {
+      itemId: body.ItemId,
+      position: body.PositionTicks / 10000000,
+      isPaused: body.IsPaused,
+    });
+    return HttpResponse.json({ success: true });
+  }),
+
+  // Report playback stopped
+  http.post(`${MOCK_SERVER_URL}/Sessions/Playing/Stopped`, async ({ request }) => {
+    const body = await request.json() as any;
+    console.log('⏹️ [MSW] Playback stopped:', {
+      itemId: body.ItemId,
+      position: body.PositionTicks / 10000000,
+    });
+    return HttpResponse.json({ success: true });
+  }),
+
+  // Mark item as played
+  http.post(`${MOCK_SERVER_URL}/Users/:userId/PlayedItems/:itemId`, ({ params }) => {
+    console.log('✅ [MSW] Item marked as played:', params.itemId);
+    return HttpResponse.json({ success: true });
+  }),
 ];
