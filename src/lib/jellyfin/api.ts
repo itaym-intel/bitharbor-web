@@ -1,0 +1,82 @@
+import { jellyfinClient } from './client';
+import type { Library, MediaItem } from '@/types/jellyfin';
+
+export class JellyfinApiService {
+  private getUserId(): string {
+    const userData = localStorage.getItem('jellyfin_user');
+    if (!userData) throw new Error('User not logged in');
+    return JSON.parse(userData).Id;
+  }
+
+  getImageUrl(itemId: string, imageType = 'Primary', width?: number): string {
+    const url = jellyfinClient.getServerUrl() + '/Items/' + itemId + '/Images/' + imageType;
+    return width ? url + '?width=' + width + '&quality=90' : url;
+  }
+
+  async getLibraries(): Promise<Library[]> {
+    try {
+      const userId = this.getUserId();
+      const url = jellyfinClient.getServerUrl() + '/Users/' + userId + '/Views';
+      const response = await fetch(url, {
+        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+      });
+      const data = await response.json();
+      return (data.Items || []).map((item: any) => ({
+        Id: item.Id,
+        Name: item.Name,
+        CollectionType: item.CollectionType,
+      }));
+    } catch (error) {
+      console.error('Failed to fetch libraries:', error);
+      return [];
+    }
+  }
+
+  async getContinueWatching(limit = 12): Promise<MediaItem[]> {
+    try {
+      const userId = this.getUserId();
+      const url = jellyfinClient.getServerUrl() + '/Users/' + userId + '/Items/Resume?Limit=' + limit;
+      const response = await fetch(url, {
+        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+      });
+      const data = await response.json();
+      return this.mapItems(data.Items || []);
+    } catch (error) {
+      console.error('Failed:', error);
+      return [];
+    }
+  }
+
+  async getRecentlyAdded(limit = 12): Promise<MediaItem[]> {
+    try {
+      const userId = this.getUserId();
+      const url = jellyfinClient.getServerUrl() + '/Users/' + userId + '/Items/Latest?Limit=' + limit;
+      const response = await fetch(url, {
+        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+      });
+      const data = await response.json();
+      return this.mapItems(data);
+    } catch (error) {
+      console.error('Failed:', error);
+      return [];
+    }
+  }
+
+  private mapItems(items: any[]): MediaItem[] {
+    return items.map(item => ({
+      Id: item.Id || '',
+      Name: item.Name || '',
+      Type: item.Type || '',
+      Overview: item.Overview,
+      ImageTags: item.ImageTags,
+      UserData: item.UserData,
+      ProductionYear: item.ProductionYear,
+      RunTimeTicks: item.RunTimeTicks,
+      OfficialRating: item.OfficialRating,
+      CommunityRating: item.CommunityRating,
+      Genres: item.Genres,
+    }));
+  }
+}
+
+export const jellyfinApi = new JellyfinApiService();

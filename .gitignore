@@ -27,3 +27,4 @@ logs/
 npm-debug.log*
 
 *.md
+.env.example
