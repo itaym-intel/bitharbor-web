@@ -24,6 +24,7 @@ export function Player() {
   });
 
   const handleProgressUpdate = (position: number) => {
+    currentTime = position; // Update current time
     reportProgressMutation.mutate({ position, isPaused: false });
 
     // Mark as watched at 90%
@@ -39,6 +40,16 @@ export function Player() {
     }
     navigate(-1); // Go back to previous page
   };
+
+  const handleBack = () => {
+    // Report current position before going back
+    if (item) {
+      reportStoppedMutation.mutate(currentTime);
+    }
+    navigate(-1);
+  };
+
+  let currentTime = 0; // Track current time for back button
 
   if (isLoading) {
     return (
@@ -85,6 +96,7 @@ export function Player() {
       startPosition={startPosition}
       onProgressUpdate={handleProgressUpdate}
       onPlaybackEnd={handlePlaybackEnd}
+      onBack={handleBack}
     />
   );
 }

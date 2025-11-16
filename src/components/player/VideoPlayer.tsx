@@ -16,6 +16,7 @@ import {
   FullscreenExit,
   Settings,
   Subtitles,
+  ArrowBack,
 } from '@mui/icons-material';
 
 interface VideoPlayerProps {
@@ -25,6 +26,7 @@ interface VideoPlayerProps {
   startPosition?: number; // resume position in seconds
   onProgressUpdate: (position: number) => void;
   onPlaybackEnd: () => void;
+  onBack?: () => void; // Optional back button handler
 }
 
 export function VideoPlayer({
@@ -34,6 +36,7 @@ export function VideoPlayer({
   startPosition = 0,
   onProgressUpdate,
   onPlaybackEnd,
+  onBack,
 }: VideoPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(startPosition);
@@ -269,7 +272,7 @@ export function VideoPlayer({
         </Box>
       </Fade>
 
-      {/* Title Overlay */}
+      {/* Title Overlay with Back Button */}
       <Fade in={showControls}>
         <Box
           sx={{
@@ -279,8 +282,20 @@ export function VideoPlayer({
             right: 0,
             background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%)',
             padding: 2,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
           }}
         >
+          {onBack && (
+            <IconButton
+              onClick={onBack}
+              sx={{ color: 'white' }}
+              size="large"
+            >
+              <ArrowBack />
+            </IconButton>
+          )}
           <Typography variant="h5" color="white">
             {itemName}
           </Typography>
