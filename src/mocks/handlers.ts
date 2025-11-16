@@ -55,6 +55,48 @@ export const handlers = [
     return HttpResponse.json({ status: 'healthy' });
   }),
 
+  // API documentation endpoint - Shows available endpoints (like FastAPI /docs)
+  http.get(`${MOCK_SERVER_URL}/api/docs`, () => {
+    console.log('📖 [MSW] API docs requested');
+    return HttpResponse.json({
+      title: 'BitHarbor Media Server API (Mock)',
+      version: '1.0.0',
+      endpoints: {
+        authentication: {
+          'POST /Users/AuthenticateByName': 'Login with username and password',
+        },
+        libraries: {
+          'GET /Users/{userId}/Views': 'Get all media libraries',
+          'GET /Users/{userId}/Items': 'Get items from a library (supports filtering, sorting)',
+          'GET /Users/{userId}/Items/{itemId}': 'Get single item details',
+          'GET /Users/{userId}/Items/Resume': 'Get continue watching items',
+          'GET /Users/{userId}/Items/Latest': 'Get recently added items',
+        },
+        favorites: {
+          'POST /Users/{userId}/FavoriteItems/{itemId}': 'Mark item as favorite',
+          'DELETE /Users/{userId}/FavoriteItems/{itemId}': 'Remove from favorites',
+        },
+        playback: {
+          'POST /Sessions/Playing/Progress': 'Report playback progress',
+          'POST /Sessions/Playing/Stopped': 'Report playback stopped',
+          'POST /Users/{userId}/PlayedItems/{itemId}': 'Mark item as played',
+        },
+        images: {
+          'GET /Items/{itemId}/Images/{imageType}': 'Get item image (Primary, Backdrop)',
+        },
+      },
+      mockData: {
+        libraries: mockLibraries.length,
+        movies: mockMovieLibraryItems.length,
+        tvShows: mockTVShowLibraryItems.length,
+        music: mockMusicLibraryItems.length,
+        favorites: mockFavorites.length,
+        continueWatching: mockContinueWatching.length,
+        recentlyAdded: mockRecentlyAdded.length,
+      },
+    });
+  }),
+
   // Authentication endpoint - Matches Python FastAPI format
   http.post(`${MOCK_SERVER_URL}/Users/AuthenticateByName`, async ({ request }) => {
     console.log('🔐 [MSW] Authentication request intercepted');
