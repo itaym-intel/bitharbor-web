@@ -9,6 +9,10 @@ import {
   Paper,
   Grid,
   IconButton,
+  Link,
+  Divider,
+  Card,
+  CardContent,
   Stack,
 } from '@mui/material';
 import {
@@ -16,6 +20,7 @@ import {
   Favorite as FavoriteIcon,
   FavoriteBorder as FavoriteBorderIcon,
   ArrowBack as ArrowBackIcon,
+  Language as WebIcon,
   Star as StarIcon,
 } from '@mui/icons-material';
 import { unifiedApiClient } from '@/lib/api/unified-client';

@@ -17,7 +17,6 @@ import { Personal } from './apps/stable/pages/Personal';
 import { Player } from './apps/stable/pages/Player';
 import { Search } from './apps/stable/pages/Search';
 import { Settings } from './apps/stable/pages/Settings';
-import { Ingest } from './apps/stable/pages/Ingest';
 import { MainLayout } from './components/layout/MainLayout';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -148,16 +147,6 @@ function AppRoutes() {
           <ProtectedRoute>
             <MainLayout>
               <Personal />
-            </MainLayout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/ingest"
-        element={
-          <ProtectedRoute>
-            <MainLayout>
-              <Ingest />
             </MainLayout>
           </ProtectedRoute>
         }

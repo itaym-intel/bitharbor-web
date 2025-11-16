@@ -5,7 +5,6 @@ export function Movies() {
     <MediaTypePage
       mediaType="movie"
       title="Movies"
-      libraryId="mock-library-movies"
     />
   );
 }

@@ -80,8 +80,8 @@ export function Setup() {
     <Container maxWidth="sm">
       <Box sx={{ mt: 8 }}>
         <Paper sx={{ p: 4 }}>
-          <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
-            BitTemple Setup
+          <Typography variant="h4" gutterBottom align="center">
+            BitHarbor Setup
           </Typography>
           
           <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>

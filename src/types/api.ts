@@ -64,7 +64,7 @@ export interface BitTempleLoginRequest {
   password: string;
 }
 
-// BitHarbor media types
+// BitTemple media types
 export type MediaType = 'movie' | 'tv' | 'music' | 'podcast' | 'video' | 'personal';
 export type SourceType = 'catalog' | 'home';
 
@@ -211,7 +211,7 @@ export interface EnrichedMetadata {
 export interface MediaItem {
   Id: string;
   Name: string;
-  Type: MediaType; // BitHarbor media type
+  Type: MediaType; // BitTemple media type
   MediaType?: MediaType; // Alias for Type
   SourceType?: SourceType; // catalog (movies/tv) or home (personal media)
   SeriesName?: string;
@@ -278,7 +278,7 @@ export interface Library {
   ItemId?: string;
 }
 
-// BitHarbor type-specific route types
+// BitTemple type-specific route types
 export type MediaTypeRoute = 'movies' | 'tv' | 'music' | 'podcasts' | 'videos' | 'personal';
 
 export interface SearchRequest {
@@ -301,6 +301,30 @@ export interface SearchResponse {
 export interface MediaListResponse {
   items: MediaDetail[];
   total: number;
+}
+
+export interface MediaDetail {
+  media_id: string;
+  type: MediaType;
+  title: string;
+  source_type: SourceType;
+  vector_hash: string;
+  file_hash?: string;
+  metadata?: Record<string, any>;
+  enriched_metadata?: EnrichedMetadata | null;
+}
+
+export interface IngestRequest {
+  path: string;
+  source_type: SourceType;
+  metadata?: Record<string, any>;
+  poster_path?: string;
+}
+
+export interface IngestResponse {
+  media_id: string;
+  file_hash: string;
+  vector_hash: string;
 }
 
 export interface CatalogMovieDetails {
@@ -360,7 +384,7 @@ export interface CatalogDownloadResponse {
   subtitle_files?: string[] | null;
   downloaded: boolean;
   video_path?: string | null;
-  subtitle_paths?: string[] | null;
+  subtitle_paths?: string | null;
   file_hash?: string | null;
   vector_hash?: string | null;
   vector_row_id?: number | null;
@@ -368,26 +392,26 @@ export interface CatalogDownloadResponse {
   created?: boolean | null;
 }
 
-export interface MediaDetail {
-  media_id: string;
-  type: MediaType;
-  title: string;
-  source_type: SourceType;
-  vector_hash: string;
+export interface LocalSearchResult {
+  media_id?: string;
   file_hash?: string;
+  vector_row_id?: number;
+  score?: number;
+  type?: MediaType;
+  title?: string;
+  overview?: string;
+  poster_url?: string;
+  backdrop_url?: string;
   metadata?: Record<string, any>;
+  metadata_by_type?: Record<string, Record<string, any>>;
   enriched_metadata?: EnrichedMetadata | null;
+  media?: MediaDetail;
+  media_detail?: MediaDetail;
+  media_metadata?: MediaDetail;
+  id?: string | number;
+  [key: string]: any;
 }
 
-export interface IngestRequest {
-  path: string;
-  source_type: SourceType;
-  metadata?: Record<string, any>;
-  poster_path?: string;
-}
-
-export interface IngestResponse {
-  media_id: string;
-  file_hash: string;
-  vector_hash: string;
+export interface LocalSearchResponse {
+  results: LocalSearchResult[];
 }

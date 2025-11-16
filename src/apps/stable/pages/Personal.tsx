@@ -5,7 +5,6 @@ export function Personal() {
     <MediaTypePage
       mediaType="personal"
       title="Personal Media"
-      libraryId="mock-library-personal"
     />
   );
 }

@@ -5,7 +5,6 @@ export function TVShows() {
     <MediaTypePage
       mediaType="tv"
       title="TV Shows"
-      libraryId="mock-library-tvshows"
     />
   );
 }

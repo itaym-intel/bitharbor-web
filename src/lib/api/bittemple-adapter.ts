@@ -25,6 +25,8 @@ import type {
   CatalogMatchResponse,
   CatalogDownloadRequest,
   CatalogDownloadResponse,
+  LocalSearchResponse,
+  LocalSearchResult,
 } from '@/types/api';
 
 export class BitTempleAdapter {
@@ -550,6 +552,141 @@ export class BitTempleAdapter {
       items,
       scores: data.results.map(r => r.score),
     };
+  }
+
+  /**
+   * Local search scoped to a specific media type, returning hydrated MediaItems
+   */
+  async localSearch(
+    mediaType: MediaType,
+    queryText: string,
+    options: {
+      limit?: number;
+      minScore?: number;
+    } = {}
+  ): Promise<MediaItem[]> {
+    const trimmedQuery = queryText.trim();
+    if (!trimmedQuery) {
+      return [];
+    }
+
+    const typeRoute = this.getTypeRoute(mediaType);
+    const params = new URLSearchParams({
+      query: trimmedQuery,
+      limit: String(options.limit ?? 5),
+      min_score: String(options.minScore ?? 0.01),
+    });
+
+    const response = await fetch(`${this.baseUrl}/${typeRoute}/local/search?${params.toString()}`, {
+      method: 'GET',
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Local search failed');
+    }
+
+    const payload: LocalSearchResponse = await response.json();
+    const results = Array.isArray(payload?.results) ? payload.results : [];
+
+    const detailedItems = results
+      .map(result => this.hydrateLocalSearchResult(result, mediaType))
+      .filter((item): item is MediaItem => Boolean(item));
+
+    return detailedItems;
+  }
+
+  private hydrateLocalSearchResult(
+    result: LocalSearchResult,
+    fallbackType: MediaType
+  ): MediaItem | null {
+    const coerceId = (...values: Array<string | number | undefined | null>): string | undefined => {
+      for (const value of values) {
+        if (typeof value === 'string' && value.trim()) {
+          return value;
+        }
+        if (typeof value === 'number' && !Number.isNaN(value)) {
+          return value.toString();
+        }
+      }
+      return undefined;
+    };
+
+    const detailCandidate = (result.media as MediaDetail)
+      || (result.media_detail as MediaDetail)
+      || (result.media_metadata as MediaDetail)
+      || null;
+
+    const metadataByType = (result.metadata_by_type || {}) as Record<MediaType, Record<string, any>>;
+    const resultType = (detailCandidate?.type as MediaType)
+      || (result.type as MediaType)
+      || fallbackType;
+    const typeMetadata = metadataByType?.[resultType] || result.metadata;
+
+    const rawId = coerceId(
+      detailCandidate?.media_id,
+      detailCandidate?.file_hash,
+      typeMetadata?.media_id,
+      typeMetadata?.file_hash,
+      (typeMetadata as any)?.id,
+      result.media_id,
+      result.file_hash as any,
+      result.vector_row_id as any,
+      result.id as any
+    );
+
+    if (!rawId) {
+      console.warn('⚠️ Local search result missing media identifier:', result);
+      return null;
+    }
+
+    const buildDetail = (metadataSource?: Record<string, any>, overrides: Partial<MediaDetail> = {}): MediaDetail => ({
+      media_id: rawId,
+      type: resultType,
+      title: metadataSource?.title || metadataSource?.name || result.title || 'Untitled',
+      source_type: metadataSource?.source_type || 'catalog',
+      vector_hash: metadataSource?.vector_hash || rawId,
+      metadata: metadataSource || {},
+      enriched_metadata: overrides.enriched_metadata ?? metadataSource?.enriched_metadata ?? result.enriched_metadata ?? null,
+      file_hash: metadataSource?.file_hash,
+      ...overrides,
+    });
+
+    if (detailCandidate) {
+      return this.transformMediaItem(
+        buildDetail(detailCandidate.metadata || typeMetadata || result.metadata, {
+          type: detailCandidate.type || resultType,
+          title: detailCandidate.title || result.title || typeMetadata?.title || 'Untitled',
+          source_type: detailCandidate.source_type || typeMetadata?.source_type || 'catalog',
+          vector_hash: detailCandidate.vector_hash || typeMetadata?.vector_hash || rawId,
+          file_hash: detailCandidate.file_hash,
+          enriched_metadata: detailCandidate.enriched_metadata ?? typeMetadata?.enriched_metadata ?? result.enriched_metadata ?? null,
+        })
+      );
+    }
+
+    if (typeMetadata) {
+      return this.transformMediaItem(buildDetail(typeMetadata));
+    }
+
+    if (result.metadata) {
+      return this.transformMediaItem(buildDetail(result.metadata));
+    }
+
+    return {
+      Id: rawId,
+      Name: result.title || 'Untitled',
+      Type: resultType,
+      MediaType: resultType,
+      Overview: result.overview,
+      PosterUrl: result.poster_url,
+      BackdropUrl: result.backdrop_url,
+      UserData: {
+        PlaybackPositionTicks: 0,
+        IsFavorite: false,
+        Played: false,
+      },
+    } as MediaItem;
   }
 
   /**

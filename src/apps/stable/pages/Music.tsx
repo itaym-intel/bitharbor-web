@@ -5,7 +5,6 @@ export function Music() {
     <MediaTypePage
       mediaType="music"
       title="Music"
-      libraryId="mock-library-music"
     />
   );
 }

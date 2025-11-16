@@ -75,11 +75,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const navItems = [
     { text: 'Home', icon: <HomeIcon />, path: '/' },
     { text: 'Movies', icon: <MovieIcon />, path: '/movies' },
-    { text: 'TV Shows', icon: <TvIcon />, path: '/tv' },
     { text: 'Music', icon: <MusicIcon />, path: '/music' },
-    { text: 'Podcasts', icon: <PodcastIcon />, path: '/podcasts' },
-    { text: 'Videos', icon: <VideoIcon />, path: '/videos' },
-    { text: 'Personal', icon: <PersonalIcon />, path: '/personal' },
   ];
 
   const drawer = (

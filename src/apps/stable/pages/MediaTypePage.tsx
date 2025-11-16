@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { SearchBar } from '@/components/common/SearchBar';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -17,53 +16,61 @@ import {
 } from '@mui/material';
 import { bitTempleAdapter } from '@/lib/api/bittemple-adapter';
 import { MediaCard } from '@/components/cards/MediaCard';
+import { SearchBar } from '@/components/common/SearchBar';
 import { CatalogIngestPanel } from '@/components/catalog/CatalogIngestPanel';
 import type { MediaItem, MediaType } from '@/types/api';
 
 interface MediaTypePageProps {
   mediaType: MediaType;
   title: string;
-  libraryId: string;
 }
 
 export function MediaTypePage({ mediaType, title }: MediaTypePageProps) {
   const navigate = useNavigate();
+  
   const [sortBy, setSortBy] = useState<'SortName' | 'PremiereDate' | 'CommunityRating'>('SortName');
   const [sortOrder, setSortOrder] = useState<'Ascending' | 'Descending'>('Ascending');
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [searchResults, setSearchResults] = useState<MediaItem[] | null>(null);
 
-  // Fetch media items for this media type
+  // Fetch media items for this media type - reuse same query key as Home page
+  // Note: Data from /{type}/ endpoint is cached indefinitely since it only changes when new media is ingested
   const { data: items, isLoading } = useQuery({
-    queryKey: [mediaType],
+    queryKey: [mediaType], // Same key as Home.tsx so data is shared
     queryFn: async () => {
       try {
         const result = await bitTempleAdapter.getMedia(mediaType);
         return result.Items;
       } catch (err) {
+        // Handle 404 gracefully (no media of this type yet)
         if (err instanceof Error && err.message.includes('404')) {
           return [];
         }
         throw err;
       }
     },
-    staleTime: Infinity,
-    gcTime: Infinity,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
+    staleTime: Infinity, // Never consider this data stale
+    gcTime: Infinity, // Keep in cache indefinitely
+    refetchOnMount: false, // Don't refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
   });
 
-  // Use search results if present, otherwise use all items
+  // Client-side filtering and sorting
   const filteredAndSortedItems = useMemo(() => {
     const baseItems = searchResults !== null ? searchResults : items || [];
     let filteredItems = [...baseItems];
+
+    // Filter by genre
     if (selectedGenres.length > 0) {
       filteredItems = filteredItems.filter((item: MediaItem) =>
         item.Genres?.some(genre => selectedGenres.includes(genre))
       );
     }
+
+    // Sort items
     filteredItems.sort((a: MediaItem, b: MediaItem) => {
       let compareResult = 0;
+
       switch (sortBy) {
         case 'SortName':
           compareResult = (a.Name || '').localeCompare(b.Name || '');
@@ -79,14 +86,17 @@ export function MediaTypePage({ mediaType, title }: MediaTypePageProps) {
         default:
           compareResult = (a.Name || '').localeCompare(b.Name || '');
       }
+
       return sortOrder === 'Descending' ? -compareResult : compareResult;
     });
+
     return filteredItems;
   }, [items, searchResults, selectedGenres, sortBy, sortOrder]);
 
   // Extract unique genres from all items (not filtered)
   const availableGenres = useMemo(() => {
     if (!items) return [];
+    
     return Array.from(
       new Set(
         items
@@ -137,10 +147,9 @@ export function MediaTypePage({ mediaType, title }: MediaTypePageProps) {
         </Typography>
       </Box>
 
-      {/* Search Bar */}
+      {/* Search & Controls */}
       <SearchBar mediaType={mediaType} onResults={setSearchResults} />
 
-      {/* Controls */}
       <Box sx={{ mb: 4 }}>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 2 }}>
           {/* Sort By */}
@@ -194,12 +203,11 @@ export function MediaTypePage({ mediaType, title }: MediaTypePageProps) {
         )}
       </Box>
 
-      {/* Catalog ingest for adding new titles */}
       <CatalogIngestPanel
         mediaType={mediaType}
         dense
-        title={`Add new ${title}`}
-        description={`Find ${title.toLowerCase()} from catalog sources that aren't in your library yet and download them directly.`}
+        title={`Add ${title}`}
+        description={`Search catalog sources for new ${title.toLowerCase()} to ingest directly.`}
       />
 
       {/* Items Grid */}

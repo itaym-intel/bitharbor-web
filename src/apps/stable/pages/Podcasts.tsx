@@ -5,7 +5,6 @@ export function Podcasts() {
     <MediaTypePage
       mediaType="podcast"
       title="Podcasts"
-      libraryId="mock-library-podcasts"
     />
   );
 }
