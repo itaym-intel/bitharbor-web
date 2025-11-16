@@ -245,6 +245,29 @@ export class MediaApiService {
     }
   }
 
+  async search(query: string, limit = 20): Promise<MediaItem[]> {
+    try {
+      const userId = this.getUserId();
+      const params = new URLSearchParams({
+        SearchTerm: query,
+        IncludeItemTypes: 'Movie,Series,MusicAlbum',
+        Limit: limit.toString(),
+        Recursive: 'true',
+      });
+      
+      const url = `${apiService.getServerUrl()}/Users/${userId}/Items?${params.toString()}`;
+      const response = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${apiService.getAccessToken()}` },
+      });
+      
+      const data = await response.json();
+      return this.mapItems(data.Items || []);
+    } catch (error) {
+      console.error('Failed to search:', error);
+      return [];
+    }
+  }
+
   private mapItems(items: any[]): MediaItem[] {
     return items.map(item => ({
       Id: item.Id || '',

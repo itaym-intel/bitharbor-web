@@ -37,6 +37,7 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
@@ -57,6 +58,14 @@ export function MainLayout({ children }: MainLayoutProps) {
     handleMenuClose();
     logout();
     navigate('/login');
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
   };
 
   const navItems = [
@@ -116,6 +125,8 @@ export function MainLayout({ children }: MainLayoutProps) {
           
           {/* Search Bar */}
           <Box
+            component="form"
+            onSubmit={handleSearch}
             sx={{
               position: 'relative',
               borderRadius: 1,
@@ -145,6 +156,8 @@ export function MainLayout({ children }: MainLayoutProps) {
             <InputBase
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               sx={{
                 color: 'inherit',
                 width: '100%',

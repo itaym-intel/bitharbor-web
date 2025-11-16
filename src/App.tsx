@@ -9,6 +9,7 @@ import { Libraries } from './apps/stable/pages/Libraries';
 import { LibraryDetail } from './apps/stable/pages/LibraryDetail';
 import { Favorites } from './apps/stable/pages/Favorites';
 import { Player } from './apps/stable/pages/Player';
+import { Search } from './apps/stable/pages/Search';
 import { MainLayout } from './components/layout/MainLayout';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
@@ -87,6 +88,16 @@ function AppRoutes() {
           <ProtectedRoute>
             <MainLayout>
               <Favorites />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/search"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Search />
             </MainLayout>
           </ProtectedRoute>
         }

@@ -178,6 +178,22 @@ export const handlers = [
     
     const url = new URL(request.url);
     const filters = url.searchParams.get('Filters');
+    const searchTerm = url.searchParams.get('SearchTerm');
+    
+    // Check if this is a search request
+    if (searchTerm) {
+      console.log('🔍 [MSW] Search request:', searchTerm);
+      const allItems = [...mockMovieLibraryItems, ...mockTVShowLibraryItems, ...mockMusicLibraryItems];
+      const results = allItems.filter(item =>
+        item.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (item.Overview && item.Overview.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+      console.log(`✅ [MSW] Found ${results.length} search results`);
+      return HttpResponse.json({
+        Items: results,
+        TotalRecordCount: results.length,
+      });
+    }
     
     // Check if this is a favorites request
     if (filters && filters.includes('IsFavorite')) {
