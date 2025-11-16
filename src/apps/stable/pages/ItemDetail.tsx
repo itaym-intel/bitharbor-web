@@ -186,13 +186,13 @@ export function ItemDetail() {
             )}
 
             {/* Additional Info for Episodes */}
-            {item.Type === 'Episode' && (
+            {item.Type === 'tv' && item.EpisodeNumber && (
               <Box sx={{ mb: 3 }}>
                 <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                   Episode Info
                 </Typography>
                 <Typography variant="body2">
-                  Season {item.ParentIndexNumber} • Episode {item.IndexNumber}
+                  Season {item.ParentIndexNumber || item.SeasonNumber} • Episode {item.IndexNumber || item.EpisodeNumber}
                 </Typography>
               </Box>
             )}

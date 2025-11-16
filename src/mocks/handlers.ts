@@ -9,6 +9,11 @@ import {
   mockMovieLibraryItems,
   mockTVShowLibraryItems,
   mockMusicLibraryItems,
+  mockMusicTrackItems,
+  mockTVEpisodeItems,
+  mockVideoItems,
+  mockPersonalMediaItems,
+  mockPodcastItems,
 } from './data';
 import { generatePosterSVG, generateBackdropSVG } from './images';
 
@@ -89,7 +94,12 @@ export const handlers = [
         libraries: mockLibraries.length,
         movies: mockMovieLibraryItems.length,
         tvShows: mockTVShowLibraryItems.length,
+        tvEpisodes: mockTVEpisodeItems.length,
         music: mockMusicLibraryItems.length,
+        musicTracks: mockMusicTrackItems.length,
+        videos: mockVideoItems.length,
+        podcasts: mockPodcastItems.length,
+        personalMedia: mockPersonalMediaItems.length,
         favorites: mockFavorites.length,
         continueWatching: mockContinueWatching.length,
         recentlyAdded: mockRecentlyAdded.length,
@@ -217,12 +227,27 @@ export const handlers = [
     if (parentId === 'mock-library-movies') {
       items = [...mockMovieLibraryItems];
     } else if (parentId === 'mock-library-tvshows') {
-      items = [...mockTVShowLibraryItems];
+      items = [...mockTVShowLibraryItems, ...mockTVEpisodeItems];
     } else if (parentId === 'mock-library-music') {
-      items = [...mockMusicLibraryItems];
+      items = [...mockMusicLibraryItems, ...mockMusicTrackItems];
+    } else if (parentId === 'mock-library-videos') {
+      items = [...mockVideoItems];
+    } else if (parentId === 'mock-library-podcasts') {
+      items = [...mockPodcastItems];
+    } else if (parentId === 'mock-library-personal') {
+      items = [...mockPersonalMediaItems];
     } else {
       // Return all items if no parent specified
-      items = [...mockMovieLibraryItems, ...mockTVShowLibraryItems, ...mockMusicLibraryItems];
+      items = [
+        ...mockMovieLibraryItems,
+        ...mockTVShowLibraryItems,
+        ...mockTVEpisodeItems,
+        ...mockMusicLibraryItems,
+        ...mockMusicTrackItems,
+        ...mockVideoItems,
+        ...mockPodcastItems,
+        ...mockPersonalMediaItems,
+      ];
     }
     
     // Filter by genre if specified
@@ -283,7 +308,12 @@ export const handlers = [
       ...mockFavorites,
       ...mockMovieLibraryItems,
       ...mockTVShowLibraryItems,
+      ...mockTVEpisodeItems,
       ...mockMusicLibraryItems,
+      ...mockMusicTrackItems,
+      ...mockVideoItems,
+      ...mockPodcastItems,
+      ...mockPersonalMediaItems,
     ];
     
     const item = allItems.find(i => i.Id === itemId);

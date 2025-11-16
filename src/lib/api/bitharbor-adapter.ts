@@ -58,7 +58,7 @@ export class BitHarborAdapter {
     return {
       Id: id,
       Name: title,
-      Type: this.guessMediaType(item.path || ''),
+      Type: this.guessMediaType(item.path || '') as import('@/types/api').MediaType,
       Overview: metadata?.description || metadata?.overview,
       ImageTags: metadata?.poster_url ? { Primary: 'has-image' } : undefined,
       UserData: {
