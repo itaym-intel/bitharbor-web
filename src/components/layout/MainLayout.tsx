@@ -28,7 +28,6 @@ import {
   Photo as PersonalIcon,
   Search as SearchIcon,
   AccountCircle,
-  CloudDownload as CloudDownloadIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -81,7 +80,6 @@ export function MainLayout({ children }: MainLayoutProps) {
     { text: 'Podcasts', icon: <PodcastIcon />, path: '/podcasts' },
     { text: 'Videos', icon: <VideoIcon />, path: '/videos' },
     { text: 'Personal', icon: <PersonalIcon />, path: '/personal' },
-    { text: 'Ingest', icon: <CloudDownloadIcon />, path: '/ingest' },
   ];
 
   const drawer = (

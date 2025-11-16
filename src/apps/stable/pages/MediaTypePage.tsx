@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import { bitHarborAdapter } from '@/lib/api/bitharbor-adapter';
 import { MediaCard } from '@/components/cards/MediaCard';
+import { CatalogIngestPanel } from '@/components/catalog/CatalogIngestPanel';
 import type { MediaItem, MediaType } from '@/types/api';
 
 interface MediaTypePageProps {
@@ -54,16 +55,7 @@ export function MediaTypePage({ mediaType, title }: MediaTypePageProps) {
 
   // Use search results if present, otherwise use all items
   const filteredAndSortedItems = useMemo(() => {
-    let baseItems: MediaItem[] = [];
-    if (searchResults && items) {
-      // Map search result IDs to full items from the already-fetched items
-      const itemsById = new Map(items.map(item => [item.Id, item]));
-      baseItems = searchResults
-        .map(result => itemsById.get(result.Id))
-        .filter((item): item is MediaItem => !!item);
-    } else {
-      baseItems = items || [];
-    }
+    const baseItems = searchResults !== null ? searchResults : items || [];
     let filteredItems = [...baseItems];
     if (selectedGenres.length > 0) {
       filteredItems = filteredItems.filter((item: MediaItem) =>
@@ -201,6 +193,14 @@ export function MediaTypePage({ mediaType, title }: MediaTypePageProps) {
           </Box>
         )}
       </Box>
+
+      {/* Catalog ingest for adding new titles */}
+      <CatalogIngestPanel
+        mediaType={mediaType}
+        dense
+        title={`Add new ${title}`}
+        description={`Find ${title.toLowerCase()} from catalog sources that aren't in your library yet and download them directly.`}
+      />
 
       {/* Items Grid */}
       {filteredAndSortedItems.length > 0 ? (

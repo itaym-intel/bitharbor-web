@@ -553,9 +553,10 @@ export class BitHarborAdapter {
   }
 
   /**
-   * Search upstream catalog (TMDb + Internet Archive) for movies not yet ingested
+   * Search upstream catalog (TMDb + Internet Archive) for media not yet ingested
    */
-  async searchCatalogMovies(
+  async searchCatalog(
+    mediaType: MediaType,
     query: string,
     options: { limit?: number; year?: number } = {}
   ): Promise<CatalogMatchResponse> {
@@ -566,7 +567,8 @@ export class BitHarborAdapter {
       params.set('year', options.year.toString());
     }
 
-    const response = await fetch(`${this.baseUrl}/movies/catalog/search?${params.toString()}`, {
+    const typeRoute = this.getTypeRoute(mediaType);
+    const response = await fetch(`${this.baseUrl}/${typeRoute}/catalog/search?${params.toString()}`, {
       headers: this.getHeaders(),
     });
 
@@ -578,15 +580,19 @@ export class BitHarborAdapter {
   }
 
   /**
-   * Trigger catalog download for a movie match key (plan or execute)
+   * Trigger catalog download for a match key (plan or execute)
    */
-  async downloadCatalogMovie(request: CatalogDownloadRequest): Promise<CatalogDownloadResponse> {
+  async downloadCatalog(
+    mediaType: MediaType,
+    request: CatalogDownloadRequest
+  ): Promise<CatalogDownloadResponse> {
     const payload: CatalogDownloadRequest = {
       match_key: request.match_key,
       execute: request.execute ?? true,
     };
 
-    const response = await fetch(`${this.baseUrl}/movies/catalog/download`, {
+    const typeRoute = this.getTypeRoute(mediaType);
+    const response = await fetch(`${this.baseUrl}/${typeRoute}/catalog/download`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify(payload),

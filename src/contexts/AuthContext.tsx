@@ -48,31 +48,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const participantsData = localStorage.getItem(PARTICIPANTS_KEY);
     const serverUrl = localStorage.getItem(SERVER_KEY);
 
-    if (token && serverUrl) {
-      // Restore admin/participants if available (new BitHarbor format)
-      if (adminData) {
-        setAdmin(JSON.parse(adminData));
-        if (participantsData) {
-          setParticipants(JSON.parse(participantsData));
-        }
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
+
+    apiService.setAccessToken(token);
+
+    // New BitHarbor auth flow (email login with admin data)
+    if (adminData) {
+      setAdmin(JSON.parse(adminData));
+      if (participantsData) {
+        setParticipants(JSON.parse(participantsData));
       }
-      
-      // Restore user if available (legacy format)
       if (userData) {
         setUser(JSON.parse(userData));
       }
-      
-      apiService.connect(serverUrl).then(() => {
-        apiService.setAccessToken(token);
-      }).catch(() => {
-        // Clear invalid session
-        logout();
-      }).finally(() => {
-        setIsLoading(false);
-      });
-    } else {
       setIsLoading(false);
+      return;
     }
+
+    // Legacy server-based auth fallback
+    if (userData && serverUrl) {
+      setUser(JSON.parse(userData));
+      apiService.connect(serverUrl)
+        .catch(() => {
+          // Clear invalid session
+          logout();
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+      return;
+    }
+
+    setIsLoading(false);
   }, []);
 
   // Legacy login method (for backward compatibility)
