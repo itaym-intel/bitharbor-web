@@ -20,8 +20,9 @@ import {
 } from '@mui/icons-material';
 
 interface VideoPlayerProps {
-  itemId: string; // Used when real backend streaming is implemented
+  itemId: string;
   itemName: string;
+  itemType: string; // movie, tv, music, podcast, video, personal
   duration: number; // in seconds
   startPosition?: number; // resume position in seconds
   onProgressUpdate: (position: number) => void;
@@ -30,8 +31,9 @@ interface VideoPlayerProps {
 }
 
 export function VideoPlayer({
-  itemId: _itemId, // Prefix with _ to indicate intentionally unused for now
+  itemId,
   itemName,
+  itemType,
   duration,
   startPosition = 0,
   onProgressUpdate,
@@ -46,39 +48,74 @@ export function VideoPlayer({
   const [showControls, setShowControls] = useState(true);
   
   const playerRef = useRef<HTMLDivElement>(null);
-  const progressIntervalRef = useRef<number>();
+  const videoRef = useRef<HTMLVideoElement>(null);
   const hideControlsTimeoutRef = useRef<number>();
 
-  // Simulate playback with timer for mock server
-  useEffect(() => {
-    if (isPlaying) {
-      progressIntervalRef.current = window.setInterval(() => {
-        setCurrentTime((prev) => {
-          const newTime = prev + 1;
-          if (newTime >= duration) {
-            setIsPlaying(false);
-            onPlaybackEnd();
-            return duration;
-          }
-          // Report progress every 10 seconds
-          if (newTime % 10 === 0) {
-            onProgressUpdate(newTime);
-          }
-          return newTime;
-        });
-      }, 1000);
-    } else {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-      }
-    }
+  // Construct stream URL based on media type
+  const typeRouteMap: Record<string, string> = {
+    movie: 'movies',
+    tv: 'tv',
+    music: 'music',
+    podcast: 'podcasts',
+    video: 'videos',
+    personal: 'personal',
+  };
+  
+  const typeRoute = typeRouteMap[itemType] || 'movies';
+  // @ts-ignore - Vite env variable
+  const backendUrl = import.meta.env?.VITE_BITHARBOR_URL || 'http://localhost:8080/api/v1';
+  // Construct stream URL with file_hash as query parameter
+  const streamUrl = `${backendUrl}/${typeRoute}/stream?file_hash=${itemId}`;
+  const token = localStorage.getItem('access_token');
 
-    return () => {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
+  // Sync video element with state
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isPlaying) {
+      video.play().catch(err => console.error('Play error:', err));
+    } else {
+      video.pause();
+    }
+  }, [isPlaying]);
+
+  // Update currentTime from video element
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleTimeUpdate = () => {
+      const newTime = video.currentTime;
+      setCurrentTime(newTime);
+      
+      // Report progress every 10 seconds
+      if (Math.floor(newTime) % 10 === 0) {
+        onProgressUpdate(newTime);
       }
     };
-  }, [isPlaying, duration, onProgressUpdate, onPlaybackEnd]);
+
+    const handleEnded = () => {
+      setIsPlaying(false);
+      onPlaybackEnd();
+    };
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('ended', handleEnded);
+
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('ended', handleEnded);
+    };
+  }, [onProgressUpdate, onPlaybackEnd]);
+
+  // Set initial playback position
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video && startPosition > 0) {
+      video.currentTime = startPosition;
+    }
+  }, [startPosition]);
 
   // Auto-hide controls
   useEffect(() => {
@@ -102,6 +139,9 @@ export function VideoPlayer({
   const handleSeek = (_event: Event, value: number | number[]) => {
     const newTime = value as number;
     setCurrentTime(newTime);
+    if (videoRef.current) {
+      videoRef.current.currentTime = newTime;
+    }
     onProgressUpdate(newTime);
   };
 
@@ -109,10 +149,17 @@ export function VideoPlayer({
     const newVolume = (value as number) / 100;
     setVolume(newVolume);
     setIsMuted(newVolume === 0);
+    if (videoRef.current) {
+      videoRef.current.volume = newVolume;
+    }
   };
 
   const handleMuteToggle = () => {
-    setIsMuted(!isMuted);
+    const newMuted = !isMuted;
+    setIsMuted(newMuted);
+    if (videoRef.current) {
+      videoRef.current.muted = newMuted;
+    }
   };
 
   const handleFullscreenToggle = () => {
@@ -155,23 +202,34 @@ export function VideoPlayer({
         cursor: showControls ? 'default' : 'none',
       }}
     >
-      {/* Mock Video Display - Black Canvas */}
-      <Box
-        sx={{
+      {/* Video Element */}
+      <video
+        ref={videoRef}
+        src={streamUrl}
+        style={{
           width: '100%',
           height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'black',
+          objectFit: 'contain',
         }}
-      >
-        {!isPlaying && (
+        preload="metadata"
+        crossOrigin="anonymous"
+      />
+
+      {/* Loading state when video is not ready */}
+      {!isPlaying && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
           <Typography variant="h4" color="white" sx={{ opacity: 0.5 }}>
             {itemName}
           </Typography>
-        )}
-      </Box>
+        </Box>
+      )}
 
       {/* Controls Overlay */}
       <Fade in={showControls}>

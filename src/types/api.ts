@@ -5,6 +5,7 @@ export interface ServerInfo {
   LocalAddress: string;
 }
 
+// Legacy User interface (for backward compatibility)
 export interface User {
   Id: string;
   Name: string;
@@ -14,15 +15,198 @@ export interface User {
   LastLoginDate?: string;
 }
 
+// Legacy AuthResponse (for backward compatibility)
 export interface AuthResponse {
   User: User;
   AccessToken: string;
   ServerId: string;
 }
 
+// BitHarbor Admin and Participant types
+export interface Admin {
+  admin_id: string;
+  email: string;
+  display_name: string;
+}
+
+export type ParticipantRole = 'viewer' | 'editor' | 'admin';
+
+export interface Participant {
+  participant_id: string;
+  handle: string;
+  display_name: string;
+  email: string;
+  role: ParticipantRole;
+  preferences_json: string | null;
+}
+
+export interface BitHarborAuthResponse {
+  access_token: string;
+  token_type: 'bearer';
+  admin: Admin;
+  participants: Participant[];
+}
+
+export interface BitHarborSetupRequest {
+  email: string;
+  password: string;
+  display_name: string;
+  participants?: Array<{
+    handle: string;
+    display_name: string;
+    email: string;
+    role: ParticipantRole;
+  }>;
+}
+
+export interface BitHarborLoginRequest {
+  email: string;
+  password: string;
+}
+
 // BitHarbor media types
 export type MediaType = 'movie' | 'tv' | 'music' | 'podcast' | 'video' | 'personal';
 export type SourceType = 'catalog' | 'home';
+
+// Cast and Crew types
+export interface CastMember {
+  name: string;
+  character: string;
+  order: number; // 0 = top billed
+  profile_path: string | null;
+}
+
+export interface CrewMember {
+  name: string;
+  job: string; // "Director", "Writer", etc.
+  department: string; // "Directing", "Writing", etc.
+}
+
+export interface ImageMetadata {
+  file_path: string;
+  width: number | null;
+  height: number | null;
+  aspect_ratio: number | null;
+  vote_average: number | null;
+  vote_count: number | null;
+  iso_639_1: string | null; // Language code
+}
+
+// Enriched Metadata types
+export interface MovieMetadata {
+  tmdb_id: number | null;
+  imdb_id: string | null;
+  title: string;
+  original_title: string | null;
+  tagline: string | null;
+  overview: string | null;
+  release_date: string | null; // ISO 8601
+  year: number | null;
+  status: string | null;
+  runtime_min: number | null;
+  budget: number | null;
+  revenue: number | null;
+  genres: string[] | null;
+  languages: string[] | null;
+  countries: string[] | null;
+  vote_average: number | null; // 0-10
+  vote_count: number | null;
+  popularity: number | null;
+  cast: CastMember[] | null;
+  crew: CrewMember[] | null;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  posters: ImageMetadata[] | null;
+  backdrops: ImageMetadata[] | null;
+  poster_url: string | null;
+  backdrop_url: string | null;
+  homepage: string | null;
+  adult: boolean | null;
+}
+
+export interface TvShowMetadata {
+  tmdb_id: number | null;
+  imdb_id: string | null;
+  tvmaze_id: number | null;
+  name: string;
+  original_name: string | null;
+  tagline: string | null;
+  overview: string | null;
+  type: string | null;
+  status: string | null;
+  first_air_date: string | null; // ISO 8601
+  last_air_date: string | null; // ISO 8601
+  number_of_seasons: number | null;
+  number_of_episodes: number | null;
+  genres: string[] | null;
+  languages: string[] | null;
+  countries: string[] | null;
+  vote_average: number | null;
+  vote_count: number | null;
+  popularity: number | null;
+  cast: CastMember[] | null;
+  crew: CrewMember[] | null;
+  created_by: string[] | null;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  posters: ImageMetadata[] | null;
+  backdrops: ImageMetadata[] | null;
+  poster_url: string | null;
+  backdrop_url: string | null;
+  homepage: string | null;
+  networks: string[] | null;
+}
+
+export interface TvEpisodeMetadata {
+  tmdb_id: number | null;
+  imdb_id: string | null;
+  tvmaze_id: number | null;
+  series_name: string | null;
+  series_tmdb_id: number | null;
+  name: string;
+  overview: string | null;
+  season_number: number;
+  episode_number: number;
+  air_date: string | null; // ISO 8601
+  runtime_min: number | null;
+  vote_average: number | null;
+  vote_count: number | null;
+  cast: CastMember[] | null;
+  crew: CrewMember[] | null;
+  still_path: string | null;
+  still_url: string | null;
+}
+
+export interface MusicTrackMetadata {
+  musicbrainz_id: string | null;
+  isrc: string | null;
+  title: string;
+  artist: string | null;
+  album: string | null;
+  track_number: number | null;
+  disc_number: number | null;
+  duration_s: number | null;
+  year: number | null;
+  genres: string[] | null;
+}
+
+export interface PodcastEpisodeMetadata {
+  guid: string | null;
+  title: string;
+  show_name: string | null;
+  description: string | null;
+  pub_date: string | null; // ISO 8601
+  duration_s: number | null;
+  image_url: string | null;
+}
+
+export interface EnrichedMetadata {
+  movie?: MovieMetadata;
+  tv_show?: TvShowMetadata;
+  tv_episode?: TvEpisodeMetadata;
+  music?: MusicTrackMetadata;
+  podcast?: PodcastEpisodeMetadata;
+}
 
 export interface MediaItem {
   Id: string;
@@ -36,6 +220,8 @@ export interface MediaItem {
   ParentIndexNumber?: number; // Season number or disc number
   Overview?: string;
   ImageTags?: Record<string, string>;
+  PosterUrl?: string; // Direct URL to poster image
+  BackdropUrl?: string; // Direct URL to backdrop image
   UserData?: {
     PlayedPercentage?: number;
     Played: boolean;
@@ -53,6 +239,9 @@ export interface MediaItem {
   RuntimeMinutes?: number;
   Cast?: string[];
   Director?: string;
+  Tagline?: string;
+  Budget?: number;
+  Revenue?: number;
   // TV-specific
   SeriesId?: string;
   SeasonNumber?: number;
@@ -122,6 +311,7 @@ export interface MediaDetail {
   vector_hash: string;
   file_hash?: string;
   metadata?: Record<string, any>;
+  enriched_metadata?: EnrichedMetadata | null;
 }
 
 export interface IngestRequest {

@@ -18,13 +18,16 @@ export class UnifiedApiClient {
   constructor() {
     // @ts-ignore - Vite env variable
     this.backendType = (import.meta.env?.VITE_BACKEND_TYPE || 'mock') as BackendType;
+    // @ts-ignore - Vite env variable
+    const backendUrl = import.meta.env?.VITE_BITHARBOR_URL || 'http://localhost:8080/api/v1';
+    
     this.mockApi = new MediaApiService();
-    this.bitHarborApi = new BitHarborAdapter(
-      // @ts-ignore - Vite env variable  
-      import.meta.env?.VITE_BITHARBOR_URL || 'http://localhost:8080/api/v1'
-    );
+    this.bitHarborApi = new BitHarborAdapter(backendUrl);
 
     console.log(`🔧 API Client initialized with backend: ${this.backendType}`);
+    console.log(`🌐 Backend URL: ${backendUrl}`);
+    // @ts-ignore
+    console.log('🔍 Debug - import.meta.env:', import.meta.env);
   }
 
   /**

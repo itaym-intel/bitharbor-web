@@ -14,7 +14,7 @@ import {
   Stack,
   SelectChangeEvent,
 } from '@mui/material';
-import { apiClient } from '@/lib/api/api';
+import { bitHarborAdapter } from '@/lib/api/bitharbor-adapter';
 import { MediaCard } from '@/components/cards/MediaCard';
 import type { MediaItem, MediaType } from '@/types/api';
 
@@ -31,27 +31,38 @@ export function MediaTypePage({ mediaType, title, libraryId }: MediaTypePageProp
   const [sortOrder, setSortOrder] = useState<'Ascending' | 'Descending'>('Ascending');
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
-  // Fetch library items for this media type (without sorting - we'll do it client-side)
-  const { data: libraryData, isLoading } = useQuery({
-    queryKey: ['mediaType', mediaType, libraryId],
-    queryFn: () => apiClient.getLibraryItems(libraryId),
+  // Fetch media items for this media type - reuse same query key as Home page
+  const { data: items, isLoading, error } = useQuery({
+    queryKey: [mediaType], // Same key as Home.tsx so data is shared
+    queryFn: async () => {
+      try {
+        const result = await bitHarborAdapter.getMedia(mediaType, { limit: 1000, offset: 0 });
+        return result.Items;
+      } catch (err) {
+        // Handle 404 gracefully (no media of this type yet)
+        if (err instanceof Error && err.message.includes('404')) {
+          return [];
+        }
+        throw err;
+      }
+    },
   });
 
   // Client-side filtering and sorting
   const filteredAndSortedItems = useMemo(() => {
-    if (!libraryData?.items) return [];
+    if (!items) return [];
 
-    let items = [...libraryData.items];
+    let filteredItems = [...items];
 
     // Filter by genre
     if (selectedGenres.length > 0) {
-      items = items.filter((item: MediaItem) =>
+      filteredItems = filteredItems.filter((item: MediaItem) =>
         item.Genres?.some(genre => selectedGenres.includes(genre))
       );
     }
 
     // Sort items
-    items.sort((a: MediaItem, b: MediaItem) => {
+    filteredItems.sort((a: MediaItem, b: MediaItem) => {
       let compareResult = 0;
 
       switch (sortBy) {
@@ -73,21 +84,21 @@ export function MediaTypePage({ mediaType, title, libraryId }: MediaTypePageProp
       return sortOrder === 'Descending' ? -compareResult : compareResult;
     });
 
-    return items;
-  }, [libraryData?.items, selectedGenres, sortBy, sortOrder]);
+    return filteredItems;
+  }, [items, selectedGenres, sortBy, sortOrder]);
 
   // Extract unique genres from all items (not filtered)
   const availableGenres = useMemo(() => {
-    if (!libraryData?.items) return [];
+    if (!items) return [];
     
     return Array.from(
       new Set(
-        libraryData.items
+        items
           .flatMap((item: MediaItem) => item.Genres || [])
           .filter(Boolean)
       )
-    ).sort();
-  }, [libraryData?.items]);
+    ).sort() as string[];
+  }, [items]);
 
   const handleSortChange = (event: SelectChangeEvent) => {
     setSortBy(event.target.value as 'SortName' | 'PremiereDate' | 'CommunityRating');
@@ -126,7 +137,7 @@ export function MediaTypePage({ mediaType, title, libraryId }: MediaTypePageProp
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {filteredAndSortedItems.length} items
-          {selectedGenres.length > 0 && ` (filtered from ${libraryData?.totalCount || 0})`}
+          {selectedGenres.length > 0 && ` (filtered from ${items?.length || 0})`}
         </Typography>
       </Box>
 

@@ -92,6 +92,7 @@ export function Player() {
     <VideoPlayer
       itemId={item.Id}
       itemName={item.Name || 'Unknown'}
+      itemType={item.Type}
       duration={duration}
       startPosition={startPosition}
       onProgressUpdate={handleProgressUpdate}

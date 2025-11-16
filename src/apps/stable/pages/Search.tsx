@@ -10,7 +10,7 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
-import { apiClient } from '@/lib/api/api';
+import { bitHarborAdapter } from '@/lib/api/bitharbor-adapter';
 import { MediaCard } from '@/components/cards/MediaCard';
 import type { MediaItem } from '@/types/api';
 
@@ -26,10 +26,15 @@ export function Search() {
     setSearchQuery(queryParam);
   }, [searchParams]);
 
-  // Fetch search results
+  // Fetch search results using BitHarbor vector search
   const { data: results, isLoading } = useQuery({
     queryKey: ['search', initialQuery],
-    queryFn: () => apiClient.search(initialQuery),
+    queryFn: async () => {
+      if (!initialQuery.trim()) return [];
+      // Search across all media types
+      const searchResult = await bitHarborAdapter.vectorSearch(initialQuery, undefined, { k: 50 });
+      return searchResult.items;
+    },
     enabled: initialQuery.length > 0,
   });
 

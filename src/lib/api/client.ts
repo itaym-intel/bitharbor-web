@@ -3,9 +3,12 @@
  * Handles HTTP requests to Python FastAPI backend
  */
 
+import { bitHarborAdapter } from './bitharbor-adapter';
+
 class ApiServiceClient {
   private serverUrl: string = '';
   private accessToken: string = '';
+  public bitHarborAdapter = bitHarborAdapter;
 
   constructor() {
     // Load saved server URL from localStorage

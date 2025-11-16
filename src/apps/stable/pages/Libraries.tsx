@@ -1,96 +1,78 @@
 import { Box, Typography, Grid, Card, CardContent, CardMedia } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { apiClient } from '@/lib/api/api';
-import { VideoLibrary as VideoLibraryIcon } from '@mui/icons-material';
+import { 
+  Movie as MovieIcon,
+  Tv as TvIcon,
+  MusicNote as MusicIcon,
+  Podcasts as PodcastIcon,
+  VideoLibrary as VideoIcon,
+  PhotoLibrary as PhotoIcon,
+} from '@mui/icons-material';
+import type { MediaItem } from '@/types/api';
 
 export function Libraries() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   
-  const { data: libraries, isLoading } = useQuery({
-    queryKey: ['libraries'],
-    queryFn: () => apiClient.getLibraries(),
-  });
+  // Get counts from cached data
+  const movieCache = queryClient.getQueryData<MediaItem[]>(['movie']);
+  const tvCache = queryClient.getQueryData<MediaItem[]>(['tv']);
+  const musicCache = queryClient.getQueryData<MediaItem[]>(['music']);
+  const podcastCache = queryClient.getQueryData<MediaItem[]>(['podcast']);
+  const videoCache = queryClient.getQueryData<MediaItem[]>(['video']);
+  const personalCache = queryClient.getQueryData<MediaItem[]>(['personal']);
 
-  // Fetch item counts for each library
-  const { data: movieCount } = useQuery({
-    queryKey: ['libraryCount', 'mock-library-movies'],
-    queryFn: async () => {
-      const result = await apiClient.getLibraryItems('mock-library-movies', { limit: 1 });
-      return result.totalCount;
-    },
-  });
-
-  const { data: tvCount } = useQuery({
-    queryKey: ['libraryCount', 'mock-library-tvshows'],
-    queryFn: async () => {
-      const result = await apiClient.getLibraryItems('mock-library-tvshows', { limit: 1 });
-      return result.totalCount;
-    },
-  });
-
-  const { data: musicCount } = useQuery({
-    queryKey: ['libraryCount', 'mock-library-music'],
-    queryFn: async () => {
-      const result = await apiClient.getLibraryItems('mock-library-music', { limit: 1 });
-      return result.totalCount;
-    },
-  });
-
-  const getItemCount = (libraryId: string) => {
-    if (libraryId === 'mock-library-movies') return movieCount;
-    if (libraryId === 'mock-library-tvshows') return tvCount;
-    if (libraryId === 'mock-library-music') return musicCount;
-    return undefined;
-  };
-
-  if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
-        <Typography>Loading libraries...</Typography>
-      </Box>
-    );
-  }
+  const mediaTypes = [
+    { id: 'movie', name: 'Movies', icon: MovieIcon, count: movieCache?.length || 0, path: '/movies' },
+    { id: 'tv', name: 'TV Shows', icon: TvIcon, count: tvCache?.length || 0, path: '/tv' },
+    { id: 'music', name: 'Music', icon: MusicIcon, count: musicCache?.length || 0, path: '/music' },
+    { id: 'podcast', name: 'Podcasts', icon: PodcastIcon, count: podcastCache?.length || 0, path: '/podcasts' },
+    { id: 'video', name: 'Videos', icon: VideoIcon, count: videoCache?.length || 0, path: '/videos' },
+    { id: 'personal', name: 'Personal', icon: PhotoIcon, count: personalCache?.length || 0, path: '/personal' },
+  ];
 
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Libraries
+        Media Types
       </Typography>
       <Grid container spacing={3} sx={{ mt: 2 }}>
-        {libraries?.map((library) => (
-          <Grid item xs={12} sm={6} md={4} key={library.Id}>
-            <Card
-              sx={{
-                cursor: 'pointer',
-                transition: 'transform 0.2s',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                },
-              }}
-              onClick={() => navigate(`/library/${library.Id}`)}
-            >
-              <CardMedia
+        {mediaTypes.map((mediaType) => {
+          const Icon = mediaType.icon;
+          return (
+            <Grid item xs={12} sm={6} md={4} key={mediaType.id}>
+              <Card
                 sx={{
-                  height: 140,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  bgcolor: 'primary.dark',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s',
+                  '&:hover': {
+                    transform: 'scale(1.02)',
+                  },
                 }}
+                onClick={() => navigate(mediaType.path)}
               >
-                <VideoLibraryIcon sx={{ fontSize: 60, color: 'primary.light' }} />
-              </CardMedia>
-              <CardContent>
-                <Typography variant="h6">{library.Name}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {library.CollectionType || 'Mixed'}
-                  {getItemCount(library.Id) !== undefined && ` • ${getItemCount(library.Id)} items`}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+                <CardMedia
+                  sx={{
+                    height: 140,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: 'primary.dark',
+                  }}
+                >
+                  <Icon sx={{ fontSize: 60, color: 'primary.light' }} />
+                </CardMedia>
+                <CardContent>
+                  <Typography variant="h6">{mediaType.name}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {mediaType.count} items
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          );
+        })}
       </Grid>
     </Box>
   );

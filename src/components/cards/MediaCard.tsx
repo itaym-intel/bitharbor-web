@@ -1,5 +1,4 @@
 import { Card, CardMedia, CardContent, Typography, LinearProgress, Box, Chip } from '@mui/material';
-import { apiClient } from '@/lib/api/api';
 import type { MediaItem } from '@/types/api';
 
 interface MediaCardProps {
@@ -8,9 +7,8 @@ interface MediaCardProps {
 }
 
 export function MediaCard({ item, onClick }: MediaCardProps) {
-  const imageUrl = item.ImageTags?.Primary
-    ? apiClient.getImageUrl(item.Id, 'Primary', 300)
-    : undefined;
+  // Use the poster URL directly (already includes full TMDb URL from backend)
+  const imageUrl = item.PosterUrl || '/placeholder.jpg';
 
   const progress =
     item.UserData?.PlayedPercentage && item.UserData.PlayedPercentage > 0

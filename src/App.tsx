@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CssBaseline } from '@mui/material';
 import { Login } from './apps/stable/pages/Login';
+import { Setup } from './apps/stable/pages/Setup';
 import { Home } from './apps/stable/pages/Home';
 import { ItemDetail } from './apps/stable/pages/ItemDetail';
 import { Libraries } from './apps/stable/pages/Libraries';
@@ -49,6 +50,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginRoute />} />
+      <Route path="/setup" element={<Setup />} />
       <Route
         path="/"
         element={

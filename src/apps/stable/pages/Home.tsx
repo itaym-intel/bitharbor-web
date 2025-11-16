@@ -1,32 +1,44 @@
-import { Box, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { apiClient } from '@/lib/api/api';
+import { bitHarborAdapter } from '@/lib/api/bitharbor-adapter';
 import { MediaRow } from '@/components/cards/MediaRow';
 
 export function Home() {
   const navigate = useNavigate();
 
-  const { data: continueWatching, isLoading: loadingContinue } = useQuery({
-    queryKey: ['continueWatching'],
-    queryFn: () => apiClient.getContinueWatching(),
+  // Get movies from BitHarbor backend
+  const { data: movies, isLoading: loadingMovies } = useQuery({
+    queryKey: ['movies'],
+    queryFn: async () => {
+      const result = await bitHarborAdapter.getMedia('movie', { limit: 12, offset: 0 });
+      return result.Items;
+    },
   });
 
-  const { data: recentlyAdded, isLoading: loadingRecent } = useQuery({
-    queryKey: ['recentlyAdded'],
-    queryFn: () => apiClient.getRecentlyAdded(),
+  // Get TV shows from BitHarbor backend
+  const { data: tvShows, isLoading: loadingTV } = useQuery({
+    queryKey: ['tv'],
+    queryFn: async () => {
+      const result = await bitHarborAdapter.getMedia('tv', { limit: 12, offset: 0 });
+      return result.Items;
+    },
   });
 
-  const { data: favorites, isLoading: loadingFavorites } = useQuery({
-    queryKey: ['favorites'],
-    queryFn: () => apiClient.getFavorites(),
+  // Get music from BitHarbor backend
+  const { data: music, isLoading: loadingMusic } = useQuery({
+    queryKey: ['music'],
+    queryFn: async () => {
+      const result = await bitHarborAdapter.getMedia('music', { limit: 12, offset: 0 });
+      return result.Items;
+    },
   });
 
   const handleItemClick = (item: any) => {
     navigate(`/item/${item.Id}`);
   };
 
-  const isLoading = loadingContinue || loadingRecent || loadingFavorites;
+  const isLoading = loadingMovies || loadingTV || loadingMusic;
 
   return (
     <Box>
@@ -36,24 +48,28 @@ export function Home() {
         </Box>
       ) : (
         <>
-          {continueWatching && continueWatching.length > 0 && (
+          <Typography variant="h4" sx={{ mb: 3 }}>
+            Welcome to BitHarbor
+          </Typography>
+          
+          {movies && movies.length > 0 && (
             <MediaRow
-              title="Continue Watching"
-              items={continueWatching}
+              title="Movies"
+              items={movies}
               onItemClick={handleItemClick}
             />
           )}
-          {recentlyAdded && recentlyAdded.length > 0 && (
+          {tvShows && tvShows.length > 0 && (
             <MediaRow
-              title="Recently Added"
-              items={recentlyAdded}
+              title="TV Shows"
+              items={tvShows}
               onItemClick={handleItemClick}
             />
           )}
-          {favorites && favorites.length > 0 && (
+          {music && music.length > 0 && (
             <MediaRow
-              title="Favorites"
-              items={favorites}
+              title="Music"
+              items={music}
               onItemClick={handleItemClick}
             />
           )}

@@ -7,17 +7,17 @@ import {
   Typography,
   Box,
   Alert,
+  Link,
 } from '@mui/material';
 import { useAuth } from '@/hooks/useAuth';
 
 export function Login() {
-  const [serverUrl, setServerUrl] = useState('http://localhost:8096');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const { login } = useAuth();
+  const { loginWithEmail } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,10 +25,11 @@ export function Login() {
     setIsLoading(true);
 
     try {
-      await login(serverUrl, username, password);
+      const admin = await loginWithEmail(email, password);
+      console.log('✅ Logged in as:', admin.display_name);
       // LoginRoute will handle the redirect after state updates
     } catch (err) {
-      setError('Login failed. Please check your credentials and server URL.');
+      setError('Login failed. Please check your email and password.');
       setIsLoading(false);
     }
   };
@@ -41,6 +42,10 @@ export function Login() {
             BitHarbor
           </Typography>
           
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
+            Sign in to your media server
+          </Typography>
+          
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
@@ -50,20 +55,14 @@ export function Login() {
           <form onSubmit={handleSubmit}>
             <TextField
               fullWidth
-              label="Server URL"
-              value={serverUrl}
-              onChange={(e) => setServerUrl(e.target.value)}
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               margin="normal"
               required
-            />
-            
-            <TextField
-              fullWidth
-              label="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              margin="normal"
-              required
+              autoComplete="email"
+              autoFocus
             />
             
             <TextField
@@ -74,6 +73,7 @@ export function Login() {
               onChange={(e) => setPassword(e.target.value)}
               margin="normal"
               required
+              autoComplete="current-password"
             />
             
             <Button
@@ -86,6 +86,12 @@ export function Login() {
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
             </Button>
+
+            <Box sx={{ mt: 2, textAlign: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
+                First time? <Link href="/setup" underline="hover">Set up your server</Link>
+              </Typography>
+            </Box>
           </form>
         </Paper>
       </Box>

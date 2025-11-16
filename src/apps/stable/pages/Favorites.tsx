@@ -1,17 +1,14 @@
 import { Box, Typography, Grid, CircularProgress } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Favorite as FavoriteIcon } from '@mui/icons-material';
-import { apiClient } from '@/lib/api/api';
 import { MediaCard } from '@/components/cards/MediaCard';
 
 export function Favorites() {
   const navigate = useNavigate();
 
-  const { data: favorites, isLoading } = useQuery({
-    queryKey: ['favorites'],
-    queryFn: () => apiClient.getFavorites(100), // Get more favorites
-  });
+  // BitHarbor doesn't have favorites endpoint yet - show placeholder
+  const favorites: any[] = [];
+  const isLoading = false;
 
   const handleItemClick = (item: any) => {
     navigate(`/item/${item.Id}`);
