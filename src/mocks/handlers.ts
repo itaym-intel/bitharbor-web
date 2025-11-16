@@ -367,7 +367,7 @@ export const handlers = [
     console.log('🌐 [MSW] System info request intercepted');
     return HttpResponse.json({
       LocalAddress: MOCK_SERVER_URL,
-      ServerName: 'Mock Jellyfin Server',
+      ServerName: 'Mock BitHarbor-web Server',
       Version: '10.8.0',
       Id: 'mock-server-id',
     });

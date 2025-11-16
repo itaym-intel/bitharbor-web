@@ -1,4 +1,4 @@
-// Mock data for Jellyfin API responses
+// Mock data for BitHarbor-web API responses
 
 export const mockUser = {
   Name: 'Demo User',

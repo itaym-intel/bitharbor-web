@@ -38,7 +38,7 @@ export function Login() {
       <Box sx={{ mt: 8 }}>
         <Paper sx={{ p: 4 }}>
           <Typography variant="h4" gutterBottom align="center">
-            Jellyfin
+            BitHarbor
           </Typography>
           
           {error && (

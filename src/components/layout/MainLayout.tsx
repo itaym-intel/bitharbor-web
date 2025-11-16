@@ -78,7 +78,7 @@ export function MainLayout({ children }: MainLayoutProps) {
     <Box>
       <Toolbar>
         <Typography variant="h6" noWrap component="div" sx={{ color: 'primary.main' }}>
-          Jellyfin
+          BitHarbor
         </Typography>
       </Toolbar>
       <List>
