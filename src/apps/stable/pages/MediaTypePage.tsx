@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -31,25 +31,63 @@ export function MediaTypePage({ mediaType, title, libraryId }: MediaTypePageProp
   const [sortOrder, setSortOrder] = useState<'Ascending' | 'Descending'>('Ascending');
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
-  // Fetch library items for this media type
+  // Fetch library items for this media type (without sorting - we'll do it client-side)
   const { data: libraryData, isLoading } = useQuery({
-    queryKey: ['mediaType', mediaType, sortBy, sortOrder, selectedGenres],
-    queryFn: () =>
-      apiClient.getLibraryItems(libraryId, {
-        sortBy,
-        sortOrder,
-        genres: selectedGenres.length > 0 ? selectedGenres : undefined,
-      }),
+    queryKey: ['mediaType', mediaType, libraryId],
+    queryFn: () => apiClient.getLibraryItems(libraryId),
   });
 
-  // Extract unique genres from items
-  const availableGenres = Array.from(
-    new Set(
-      libraryData?.items
-        .flatMap((item: MediaItem) => item.Genres || [])
-        .filter(Boolean)
-    )
-  ).sort();
+  // Client-side filtering and sorting
+  const filteredAndSortedItems = useMemo(() => {
+    if (!libraryData?.items) return [];
+
+    let items = [...libraryData.items];
+
+    // Filter by genre
+    if (selectedGenres.length > 0) {
+      items = items.filter((item: MediaItem) =>
+        item.Genres?.some(genre => selectedGenres.includes(genre))
+      );
+    }
+
+    // Sort items
+    items.sort((a: MediaItem, b: MediaItem) => {
+      let compareResult = 0;
+
+      switch (sortBy) {
+        case 'SortName':
+          compareResult = (a.Name || '').localeCompare(b.Name || '');
+          break;
+        case 'PremiereDate':
+          const dateA = a.ProductionYear || 0;
+          const dateB = b.ProductionYear || 0;
+          compareResult = dateA - dateB;
+          break;
+        case 'CommunityRating':
+          compareResult = (a.CommunityRating || 0) - (b.CommunityRating || 0);
+          break;
+        default:
+          compareResult = (a.Name || '').localeCompare(b.Name || '');
+      }
+
+      return sortOrder === 'Descending' ? -compareResult : compareResult;
+    });
+
+    return items;
+  }, [libraryData?.items, selectedGenres, sortBy, sortOrder]);
+
+  // Extract unique genres from all items (not filtered)
+  const availableGenres = useMemo(() => {
+    if (!libraryData?.items) return [];
+    
+    return Array.from(
+      new Set(
+        libraryData.items
+          .flatMap((item: MediaItem) => item.Genres || [])
+          .filter(Boolean)
+      )
+    ).sort();
+  }, [libraryData?.items]);
 
   const handleSortChange = (event: SelectChangeEvent) => {
     setSortBy(event.target.value as 'SortName' | 'PremiereDate' | 'CommunityRating');
@@ -87,7 +125,8 @@ export function MediaTypePage({ mediaType, title, libraryId }: MediaTypePageProp
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {libraryData?.totalCount || 0} items
+          {filteredAndSortedItems.length} items
+          {selectedGenres.length > 0 && ` (filtered from ${libraryData?.totalCount || 0})`}
         </Typography>
       </Box>
 
@@ -138,7 +177,7 @@ export function MediaTypePage({ mediaType, title, libraryId }: MediaTypePageProp
             </Stack>
             {selectedGenres.length > 0 && (
               <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                Showing {libraryData?.items.length} items matching: {selectedGenres.join(', ')}
+                Showing {filteredAndSortedItems.length} items matching: {selectedGenres.join(', ')}
               </Typography>
             )}
           </Box>
@@ -146,9 +185,9 @@ export function MediaTypePage({ mediaType, title, libraryId }: MediaTypePageProp
       </Box>
 
       {/* Items Grid */}
-      {libraryData?.items && libraryData.items.length > 0 ? (
+      {filteredAndSortedItems.length > 0 ? (
         <Grid container spacing={3}>
-          {libraryData.items.map((item: MediaItem) => (
+          {filteredAndSortedItems.map((item: MediaItem) => (
             <Grid item xs={6} sm={4} md={3} lg={2} key={item.Id}>
               <MediaCard item={item} onClick={() => handleItemClick(item)} />
             </Grid>
