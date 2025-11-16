@@ -40,7 +40,7 @@ export class UnifiedApiClient {
   async search(query: string, limit = 20): Promise<any[]> {
     if (this.backendType === 'bitharbor') {
       console.log('🔍 [BitHarbor] Vector search:', query);
-      const result = await this.bitHarborApi.vectorSearch(query, { top_k: limit });
+      const result = await this.bitHarborApi.vectorSearch(query, undefined, { k: limit });
       return result.items;
     } else {
       console.log('🔍 [Mock] Keyword search:', query);
@@ -57,7 +57,7 @@ export class UnifiedApiClient {
     options: { top_k?: number; threshold?: number } = {}
   ): Promise<{ items: any[]; scores: number[] }> {
     if (this.backendType === 'bitharbor') {
-      return this.bitHarborApi.vectorSearch(query, options);
+      return this.bitHarborApi.vectorSearch(query, undefined, { k: options.top_k });
     } else {
       // Fallback to regular search, no scores
       const items = await this.mockApi.search(query, options.top_k);
@@ -89,7 +89,7 @@ export class UnifiedApiClient {
       return this.mockApi.getLibraryItems(libraryId, options);
     } else {
       // BitHarbor: Get all media (no library filtering)
-      const result = await this.bitHarborApi.getMedia({
+      const result = await this.bitHarborApi.getMedia(null, {
         limit: options.limit || 50,
         offset: options.startIndex || 0,
       });
@@ -119,7 +119,7 @@ export class UnifiedApiClient {
       return this.mockApi.getContinueWatching(limit);
     } else {
       // BitHarbor: Get recent media as fallback
-      const result = await this.bitHarborApi.getMedia({ limit });
+      const result = await this.bitHarborApi.getMedia(null, { limit });
       return result.Items;
     }
   }
@@ -131,7 +131,7 @@ export class UnifiedApiClient {
     if (this.backendType === 'mock') {
       return this.mockApi.getRecentlyAdded(limit);
     } else {
-      const result = await this.bitHarborApi.getMedia({ limit });
+      const result = await this.bitHarborApi.getMedia(null, { limit });
       return result.Items;
     }
   }
@@ -217,7 +217,9 @@ export class UnifiedApiClient {
       // Mock: return dummy URL
       return `http://localhost:8096/Videos/${itemId}/stream.mp4`;
     } else {
-      return this.bitHarborApi.getStreamUrl(itemId);
+      // BitHarbor: stream URL requires media type, but we don't have it here
+      // This is a limitation - in real usage, we should pass the item's type
+      return this.bitHarborApi.getStreamUrl(itemId, undefined);
     }
   }
 }

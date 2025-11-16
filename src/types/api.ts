@@ -88,3 +88,51 @@ export interface Library {
   CollectionType?: string;
   ItemId?: string;
 }
+
+// BitHarbor type-specific route types
+export type MediaTypeRoute = 'movies' | 'tv' | 'music' | 'podcasts' | 'videos' | 'personal';
+
+export interface SearchRequest {
+  query: string;
+  k?: number; // default 20, max 100
+}
+
+export interface SearchResult {
+  media_id: string;
+  score: number;
+  type: MediaType;
+  title: string;
+  preview_url: string | null;
+}
+
+export interface SearchResponse {
+  results: SearchResult[];
+}
+
+export interface MediaListResponse {
+  items: MediaDetail[];
+  total: number;
+}
+
+export interface MediaDetail {
+  media_id: string;
+  type: MediaType;
+  title: string;
+  source_type: SourceType;
+  vector_hash: string;
+  file_hash?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface IngestRequest {
+  path: string;
+  source_type: SourceType;
+  metadata?: Record<string, any>;
+  poster_path?: string;
+}
+
+export interface IngestResponse {
+  media_id: string;
+  file_hash: string;
+  vector_hash: string;
+}

@@ -82,7 +82,7 @@ export const mockContinueWatching = [
   {
     Name: 'The Matrix',
     Id: 'movie-1',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 1999,
     IndexNumber: null,
     ParentIndexNumber: null,
@@ -105,7 +105,7 @@ export const mockContinueWatching = [
   {
     Name: 'Inception',
     Id: 'movie-2',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2010,
     ImageTags: { Primary: 'inception-image-tag' },
     BackdropImageTags: ['inception-backdrop'],
@@ -126,7 +126,7 @@ export const mockContinueWatching = [
   {
     Name: 'Breaking Bad',
     Id: 'episode-1',
-    Type: 'Episode',
+    Type: 'tv',
     SeriesName: 'Breaking Bad',
     SeasonName: 'Season 2',
     IndexNumber: 5,
@@ -154,7 +154,7 @@ export const mockMovieLibraryItems = [
   {
     Name: 'The Matrix',
     Id: 'movie-1',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 1999,
     ImageTags: { Primary: 'matrix-image-tag' },
     BackdropImageTags: ['matrix-backdrop'],
@@ -175,7 +175,7 @@ export const mockMovieLibraryItems = [
   {
     Name: 'Inception',
     Id: 'movie-2',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2010,
     ImageTags: { Primary: 'inception-image-tag' },
     BackdropImageTags: ['inception-backdrop'],
@@ -196,7 +196,7 @@ export const mockMovieLibraryItems = [
   {
     Name: 'Dune: Part Two',
     Id: 'movie-10',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2024,
     ImageTags: { Primary: 'dune2-image-tag' },
     BackdropImageTags: ['dune2-backdrop'],
@@ -217,7 +217,7 @@ export const mockMovieLibraryItems = [
   {
     Name: 'Oppenheimer',
     Id: 'movie-11',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2023,
     ImageTags: { Primary: 'oppenheimer-image-tag' },
     BackdropImageTags: ['oppenheimer-backdrop'],
@@ -238,7 +238,7 @@ export const mockMovieLibraryItems = [
   {
     Name: 'Barbie',
     Id: 'movie-12',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2023,
     ImageTags: { Primary: 'barbie-image-tag' },
     BackdropImageTags: ['barbie-backdrop'],
@@ -259,7 +259,7 @@ export const mockMovieLibraryItems = [
   {
     Name: 'The Shawshank Redemption',
     Id: 'movie-3',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 1994,
     ImageTags: { Primary: 'shawshank-image-tag' },
     BackdropImageTags: ['shawshank-backdrop'],
@@ -280,7 +280,7 @@ export const mockMovieLibraryItems = [
   {
     Name: 'The Dark Knight',
     Id: 'movie-4',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2008,
     ImageTags: { Primary: 'darkknight-image-tag' },
     BackdropImageTags: ['darkknight-backdrop'],
@@ -301,7 +301,7 @@ export const mockMovieLibraryItems = [
   {
     Name: 'Pulp Fiction',
     Id: 'movie-5',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 1994,
     ImageTags: { Primary: 'pulpfiction-image-tag' },
     BackdropImageTags: ['pulpfiction-backdrop'],
@@ -322,7 +322,7 @@ export const mockMovieLibraryItems = [
   {
     Name: 'Forrest Gump',
     Id: 'movie-6',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 1994,
     ImageTags: { Primary: 'forrestgump-image-tag' },
     BackdropImageTags: ['forrestgump-backdrop'],
@@ -343,7 +343,7 @@ export const mockMovieLibraryItems = [
   {
     Name: 'Interstellar',
     Id: 'movie-7',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2014,
     ImageTags: { Primary: 'interstellar-image-tag' },
     BackdropImageTags: ['interstellar-backdrop'],
@@ -364,7 +364,7 @@ export const mockMovieLibraryItems = [
   {
     Name: 'The Godfather',
     Id: 'movie-8',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 1972,
     ImageTags: { Primary: 'godfather-image-tag' },
     BackdropImageTags: ['godfather-backdrop'],
@@ -385,7 +385,7 @@ export const mockMovieLibraryItems = [
   {
     Name: 'Gladiator',
     Id: 'movie-9',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2000,
     ImageTags: { Primary: 'gladiator-image-tag' },
     BackdropImageTags: ['gladiator-backdrop'],
@@ -410,7 +410,7 @@ export const mockTVShowLibraryItems = [
   {
     Name: 'Breaking Bad',
     Id: 'series-3',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 2008,
     ImageTags: { Primary: 'bb-image-tag' },
     BackdropImageTags: ['bb-backdrop'],
@@ -430,7 +430,7 @@ export const mockTVShowLibraryItems = [
   {
     Name: 'The Last of Us',
     Id: 'series-1',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 2023,
     ImageTags: { Primary: 'tlou-image-tag' },
     BackdropImageTags: ['tlou-backdrop'],
@@ -450,7 +450,7 @@ export const mockTVShowLibraryItems = [
   {
     Name: 'The Bear',
     Id: 'series-2',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 2022,
     ImageTags: { Primary: 'bear-image-tag' },
     BackdropImageTags: ['bear-backdrop'],
@@ -470,7 +470,7 @@ export const mockTVShowLibraryItems = [
   {
     Name: 'Game of Thrones',
     Id: 'series-4',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 2011,
     ImageTags: { Primary: 'got-image-tag' },
     BackdropImageTags: ['got-backdrop'],
@@ -490,7 +490,7 @@ export const mockTVShowLibraryItems = [
   {
     Name: 'Stranger Things',
     Id: 'series-5',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 2016,
     ImageTags: { Primary: 'strangerthings-image-tag' },
     BackdropImageTags: ['strangerthings-backdrop'],
@@ -510,7 +510,7 @@ export const mockTVShowLibraryItems = [
   {
     Name: 'The Office',
     Id: 'series-6',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 2005,
     ImageTags: { Primary: 'office-image-tag' },
     BackdropImageTags: ['office-backdrop'],
@@ -530,7 +530,7 @@ export const mockTVShowLibraryItems = [
   {
     Name: 'The Wire',
     Id: 'series-7',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 2002,
     ImageTags: { Primary: 'wire-image-tag' },
     BackdropImageTags: ['wire-backdrop'],
@@ -550,7 +550,7 @@ export const mockTVShowLibraryItems = [
   {
     Name: 'Friends',
     Id: 'series-8',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 1994,
     ImageTags: { Primary: 'friends-image-tag' },
     BackdropImageTags: ['friends-backdrop'],
@@ -574,7 +574,7 @@ export const mockMusicLibraryItems = [
   {
     Name: 'The Dark Side of the Moon',
     Id: 'album-1',
-    Type: 'MusicAlbum',
+    Type: 'music',
     ProductionYear: 1973,
     AlbumArtist: 'Pink Floyd',
     ImageTags: { Primary: 'darkside-image-tag' },
@@ -592,7 +592,7 @@ export const mockMusicLibraryItems = [
   {
     Name: 'Abbey Road',
     Id: 'album-2',
-    Type: 'MusicAlbum',
+    Type: 'music',
     ProductionYear: 1969,
     AlbumArtist: 'The Beatles',
     ImageTags: { Primary: 'abbeyroad-image-tag' },
@@ -610,7 +610,7 @@ export const mockMusicLibraryItems = [
   {
     Name: 'Thriller',
     Id: 'album-3',
-    Type: 'MusicAlbum',
+    Type: 'music',
     ProductionYear: 1982,
     AlbumArtist: 'Michael Jackson',
     ImageTags: { Primary: 'thriller-image-tag' },
@@ -628,7 +628,7 @@ export const mockMusicLibraryItems = [
   {
     Name: 'Rumours',
     Id: 'album-4',
-    Type: 'MusicAlbum',
+    Type: 'music',
     ProductionYear: 1977,
     AlbumArtist: 'Fleetwood Mac',
     ImageTags: { Primary: 'rumours-image-tag' },
@@ -646,7 +646,7 @@ export const mockMusicLibraryItems = [
   {
     Name: 'The Wall',
     Id: 'album-5',
-    Type: 'MusicAlbum',
+    Type: 'music',
     ProductionYear: 1979,
     AlbumArtist: 'Pink Floyd',
     ImageTags: { Primary: 'wall-image-tag' },
@@ -664,7 +664,7 @@ export const mockMusicLibraryItems = [
   {
     Name: 'Back in Black',
     Id: 'album-6',
-    Type: 'MusicAlbum',
+    Type: 'music',
     ProductionYear: 1980,
     AlbumArtist: 'AC/DC',
     ImageTags: { Primary: 'backinblack-image-tag' },
@@ -1363,7 +1363,7 @@ export const mockRecentlyAdded = [
   {
     Name: 'Dune: Part Two',
     Id: 'movie-10',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2024,
     ImageTags: { Primary: 'dune2-image-tag' },
     BackdropImageTags: ['dune2-backdrop'],
@@ -1383,7 +1383,7 @@ export const mockRecentlyAdded = [
   {
     Name: 'Oppenheimer',
     Id: 'movie-11',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2023,
     ImageTags: { Primary: 'oppenheimer-image-tag' },
     BackdropImageTags: ['oppenheimer-backdrop'],
@@ -1403,7 +1403,7 @@ export const mockRecentlyAdded = [
   {
     Name: 'The Last of Us',
     Id: 'series-1',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 2023,
     ImageTags: { Primary: 'tlou-image-tag' },
     BackdropImageTags: ['tlou-backdrop'],
@@ -1422,7 +1422,7 @@ export const mockRecentlyAdded = [
   {
     Name: 'Barbie',
     Id: 'movie-12',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2023,
     ImageTags: { Primary: 'barbie-image-tag' },
     BackdropImageTags: ['barbie-backdrop'],
@@ -1442,7 +1442,7 @@ export const mockRecentlyAdded = [
   {
     Name: 'The Bear',
     Id: 'series-2',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 2023,
     ImageTags: { Primary: 'bear-image-tag' },
     BackdropImageTags: ['bear-backdrop'],
@@ -1465,7 +1465,7 @@ export const mockFavorites = [
   {
     Name: 'Inception',
     Id: 'movie-2',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2010,
     ImageTags: { Primary: 'inception-image-tag' },
     BackdropImageTags: ['inception-backdrop'],
@@ -1486,7 +1486,7 @@ export const mockFavorites = [
   {
     Name: 'The Shawshank Redemption',
     Id: 'movie-3',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 1994,
     ImageTags: { Primary: 'shawshank-image-tag' },
     BackdropImageTags: ['shawshank-backdrop'],
@@ -1507,7 +1507,7 @@ export const mockFavorites = [
   {
     Name: 'The Dark Knight',
     Id: 'movie-4',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 2008,
     ImageTags: { Primary: 'darkknight-image-tag' },
     BackdropImageTags: ['darkknight-backdrop'],
@@ -1528,7 +1528,7 @@ export const mockFavorites = [
   {
     Name: 'The Godfather',
     Id: 'movie-8',
-    Type: 'Movie',
+    Type: 'movie',
     ProductionYear: 1972,
     ImageTags: { Primary: 'godfather-image-tag' },
     BackdropImageTags: ['godfather-backdrop'],
@@ -1549,7 +1549,7 @@ export const mockFavorites = [
   {
     Name: 'Breaking Bad',
     Id: 'series-3',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 2008,
     ImageTags: { Primary: 'bb-image-tag' },
     BackdropImageTags: ['bb-backdrop'],
@@ -1569,7 +1569,7 @@ export const mockFavorites = [
   {
     Name: 'The Dark Side of the Moon',
     Id: 'album-1',
-    Type: 'MusicAlbum',
+    Type: 'music',
     ProductionYear: 1973,
     AlbumArtist: 'Pink Floyd',
     ImageTags: { Primary: 'darkside-image-tag' },
@@ -1587,7 +1587,7 @@ export const mockFavorites = [
   {
     Name: 'Game of Thrones',
     Id: 'series-4',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 2011,
     ImageTags: { Primary: 'got-image-tag' },
     BackdropImageTags: ['got-backdrop'],
@@ -1607,7 +1607,7 @@ export const mockFavorites = [
   {
     Name: 'The Office',
     Id: 'series-6',
-    Type: 'Series',
+    Type: 'tv',
     ProductionYear: 2005,
     ImageTags: { Primary: 'office-image-tag' },
     BackdropImageTags: ['office-backdrop'],
@@ -1627,7 +1627,7 @@ export const mockFavorites = [
   {
     Name: 'Abbey Road',
     Id: 'album-2',
-    Type: 'MusicAlbum',
+    Type: 'music',
     ProductionYear: 1969,
     AlbumArtist: 'The Beatles',
     ImageTags: { Primary: 'abbeyroad-image-tag' },
@@ -1645,7 +1645,7 @@ export const mockFavorites = [
   {
     Name: 'The Wall',
     Id: 'album-5',
-    Type: 'MusicAlbum',
+    Type: 'music',
     ProductionYear: 1979,
     AlbumArtist: 'Pink Floyd',
     ImageTags: { Primary: 'wall-image-tag' },
