@@ -285,7 +285,11 @@ export const handlers = [
   }),
 
   // Mark item as favorite
-  http.post(`${MOCK_SERVER_URL}/Users/:userId/FavoriteItems/:itemId`, ({ params }) => {
+  http.post(`${MOCK_SERVER_URL}/Users/:userId/FavoriteItems/:itemId`, ({ request, params }) => {
+    if (!validateBearerToken(request)) {
+      return HttpResponse.json({ detail: 'Not authenticated' }, { status: 401 });
+    }
+    
     const { itemId } = params;
     console.log('⭐ [MSW] Marking item as favorite:', itemId);
     
@@ -312,7 +316,11 @@ export const handlers = [
   }),
 
   // Remove item from favorites
-  http.delete(`${MOCK_SERVER_URL}/Users/:userId/FavoriteItems/:itemId`, ({ params }) => {
+  http.delete(`${MOCK_SERVER_URL}/Users/:userId/FavoriteItems/:itemId`, ({ request, params }) => {
+    if (!validateBearerToken(request)) {
+      return HttpResponse.json({ detail: 'Not authenticated' }, { status: 401 });
+    }
+    
     const { itemId } = params;
     console.log('💔 [MSW] Removing item from favorites:', itemId);
     
@@ -383,6 +391,10 @@ export const handlers = [
 
   // Report playback progress
   http.post(`${MOCK_SERVER_URL}/Sessions/Playing/Progress`, async ({ request }) => {
+    if (!validateBearerToken(request)) {
+      return HttpResponse.json({ detail: 'Not authenticated' }, { status: 401 });
+    }
+    
     const body = await request.json() as any;
     console.log('📊 [MSW] Playback progress reported:', {
       itemId: body.ItemId,
@@ -394,6 +406,10 @@ export const handlers = [
 
   // Report playback stopped
   http.post(`${MOCK_SERVER_URL}/Sessions/Playing/Stopped`, async ({ request }) => {
+    if (!validateBearerToken(request)) {
+      return HttpResponse.json({ detail: 'Not authenticated' }, { status: 401 });
+    }
+    
     const body = await request.json() as any;
     console.log('⏹️ [MSW] Playback stopped:', {
       itemId: body.ItemId,
@@ -403,7 +419,11 @@ export const handlers = [
   }),
 
   // Mark item as played
-  http.post(`${MOCK_SERVER_URL}/Users/:userId/PlayedItems/:itemId`, ({ params }) => {
+  http.post(`${MOCK_SERVER_URL}/Users/:userId/PlayedItems/:itemId`, ({ request, params }) => {
+    if (!validateBearerToken(request)) {
+      return HttpResponse.json({ detail: 'Not authenticated' }, { status: 401 });
+    }
+    
     console.log('✅ [MSW] Item marked as played:', params.itemId);
     return HttpResponse.json({ success: true });
   }),
