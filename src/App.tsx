@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, CssBaseline } from '@mui/material';
-import { theme } from './themes/dark';
+import { CssBaseline } from '@mui/material';
 import { Login } from './apps/stable/pages/Login';
 import { Home } from './apps/stable/pages/Home';
 import { ItemDetail } from './apps/stable/pages/ItemDetail';
@@ -10,8 +9,10 @@ import { LibraryDetail } from './apps/stable/pages/LibraryDetail';
 import { Favorites } from './apps/stable/pages/Favorites';
 import { Player } from './apps/stable/pages/Player';
 import { Search } from './apps/stable/pages/Search';
+import { Settings } from './apps/stable/pages/Settings';
 import { MainLayout } from './components/layout/MainLayout';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -103,6 +104,16 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Settings />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/player/:id"
         element={
           <ProtectedRoute>
@@ -117,7 +128,7 @@ function AppRoutes() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider theme={theme}>
+      <ThemeProvider>
         <CssBaseline />
         <AuthProvider>
           <BrowserRouter>
