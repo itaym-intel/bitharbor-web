@@ -1,7 +1,7 @@
 {
-  "name": "bitharbor-web",
+  "name": "bittemple-web",
   "version": "0.1.0",
-  "description": "BitHarbor web client",
+  "description": "BitTemple web client",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { CircularProgress, Box, TextField, InputAdornment } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
-import { bitHarborAdapter } from '@/lib/api/bitharbor-adapter';
+import { bitTempleAdapter } from '@/lib/api/bittemple-adapter';
 import type { MediaType, MediaItem } from '@/types/api';
 
 interface SearchBarProps {
@@ -18,9 +18,9 @@ export function SearchBar({ mediaType, onResults }: SearchBarProps) {
     queryFn: async () => {
       if (!inputValue.trim()) return [];
       // Use the /local/search endpoint for local search (GET with query params)
-      const typeRoute = (bitHarborAdapter as any).getTypeRoute(mediaType);
-      const baseUrl = (bitHarborAdapter as any).baseUrl || '';
-      const getHeaders = (bitHarborAdapter as any).getHeaders.bind(bitHarborAdapter);
+      const typeRoute = (bitTempleAdapter as any).getTypeRoute(mediaType);
+      const baseUrl = (bitTempleAdapter as any).baseUrl || '';
+      const getHeaders = (bitTempleAdapter as any).getHeaders.bind(bitTempleAdapter);
   const url = `${baseUrl}/${typeRoute}/local/search?query=${encodeURIComponent(inputValue)}&limit=5&min_score=0.2`;
   console.log('[SearchBar] Fetching:', url);
   const response = await fetch(url, {

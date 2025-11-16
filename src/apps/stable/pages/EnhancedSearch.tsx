@@ -26,7 +26,7 @@ export function EnhancedSearch() {
   const [showScores, setShowScores] = useState(false);
   
   const backendType = unifiedApiClient.getBackendType();
-  const isSmartSearch = backendType === 'bitharbor';
+  const isSmartSearch = backendType === 'bittemple';
 
   // Update local state when URL params change
   useEffect(() => {

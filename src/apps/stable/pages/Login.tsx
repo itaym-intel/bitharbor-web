@@ -38,8 +38,8 @@ export function Login() {
     <Container maxWidth="sm">
       <Box sx={{ mt: 8 }}>
         <Paper sx={{ p: 4 }}>
-          <Typography variant="h4" gutterBottom align="center">
-            BitHarbor
+          <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold' }}>
+            BitTemple
           </Typography>
           
           <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>

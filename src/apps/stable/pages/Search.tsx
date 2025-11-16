@@ -10,7 +10,7 @@ import {
   InputAdornment,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
-import { bitHarborAdapter } from '@/lib/api/bitharbor-adapter';
+import { bitTempleAdapter } from '@/lib/api/bittemple-adapter';
 import { MediaCard } from '@/components/cards/MediaCard';
 import type { MediaItem } from '@/types/api';
 
@@ -41,13 +41,13 @@ export function Search() {
   // Determine media type from route
   const mediaType = getMediaTypeFromPath(location.pathname);
 
-  // Fetch search results using BitHarbor vector search
+  // Fetch search results using BitTemple vector search
   const { data: results, isLoading } = useQuery({
-    queryKey: ['search', initialQuery, mediaType],
+    queryKey: ['local/search', initialQuery, mediaType],
     queryFn: async () => {
       if (!initialQuery.trim()) return [];
       // Only search the current media type if on a media type tab, otherwise search all
-  const searchResult = await bitHarborAdapter.vectorSearch(initialQuery, mediaType as any, { k: 50 });
+  const searchResult = await bitTempleAdapter.vectorSearch(initialQuery, mediaType as any, { k: 50 });
       return searchResult.items;
     },
     enabled: initialQuery.length > 0,

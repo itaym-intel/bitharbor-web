@@ -85,8 +85,8 @@ export function MainLayout({ children }: MainLayoutProps) {
   const drawer = (
     <Box>
       <Toolbar>
-        <Typography variant="h6" noWrap component="div" sx={{ color: 'primary.main' }}>
-          BitHarbor
+        <Typography variant="h6" noWrap component="div" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+          BitTemple
         </Typography>
       </Toolbar>
       <List>

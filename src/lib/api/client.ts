@@ -1,14 +1,14 @@
 /**
- * API Client for BitHarbor Media Server
+ * API Client for BitTemple Media Server
  * Handles HTTP requests to Python FastAPI backend
  */
 
-import { bitHarborAdapter } from './bitharbor-adapter';
+import { bitTempleAdapter } from './bittemple-adapter';
 
 class ApiServiceClient {
   private serverUrl: string = '';
   private accessToken: string = '';
-  public bitHarborAdapter = bitHarborAdapter;
+  public bitTempleAdapter = bitTempleAdapter;
 
   constructor() {
     // Load saved server URL from localStorage

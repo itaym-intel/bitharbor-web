@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { Search as SearchIcon, CloudDownload as CloudDownloadIcon } from '@mui/icons-material';
 import { useMutation } from '@tanstack/react-query';
-import { bitHarborAdapter } from '@/lib/api/bitharbor-adapter';
+import { bitTempleAdapter } from '@/lib/api/bittemple-adapter';
 import type {
   CatalogMatch,
   CatalogMatchResponse,
@@ -58,7 +58,7 @@ export function CatalogIngestPanel({
   const panelTitle = title ?? `Add ${mediaTypeLabels[mediaType]} from Catalog`;
   const panelDescription =
     description ??
-    'Search upstream catalog sources (TMDb, Internet Archive, etc.) for titles that are not yet in your BitHarbor library.';
+    'Search upstream catalog sources (TMDb, Internet Archive, etc.) for titles that are not yet in your BitTemple library.';
 
   const searchMutation = useMutation<CatalogMatchResponse, Error, void>({
     mutationFn: async () => {
@@ -69,7 +69,7 @@ export function CatalogIngestPanel({
       if (parsedYear && Number.isNaN(parsedYear)) {
         throw new Error('Year must be a number');
       }
-      return bitHarborAdapter.searchCatalog(mediaType, query.trim(), {
+      return bitTempleAdapter.searchCatalog(mediaType, query.trim(), {
         limit,
         year: parsedYear,
       });
@@ -91,7 +91,7 @@ export function CatalogIngestPanel({
   const downloadMutation = useMutation<CatalogDownloadResponse, Error, { matchKey: string; title: string }>({
     mutationFn: async ({ matchKey }) => {
       setActiveMatchKey(matchKey);
-      return bitHarborAdapter.downloadCatalog(mediaType, {
+      return bitTempleAdapter.downloadCatalog(mediaType, {
         match_key: matchKey,
         execute: true,
       });

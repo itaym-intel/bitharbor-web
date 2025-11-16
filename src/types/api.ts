@@ -22,7 +22,7 @@ export interface AuthResponse {
   ServerId: string;
 }
 
-// BitHarbor Admin and Participant types
+// BitTemple Admin and Participant types
 export interface Admin {
   admin_id: string;
   email: string;
@@ -40,14 +40,14 @@ export interface Participant {
   preferences_json: string | null;
 }
 
-export interface BitHarborAuthResponse {
+export interface BitTempleAuthResponse {
   access_token: string;
   token_type: 'bearer';
   admin: Admin;
   participants: Participant[];
 }
 
-export interface BitHarborSetupRequest {
+export interface BitTempleSetupRequest {
   email: string;
   password: string;
   display_name: string;
@@ -59,7 +59,7 @@ export interface BitHarborSetupRequest {
   }>;
 }
 
-export interface BitHarborLoginRequest {
+export interface BitTempleLoginRequest {
   email: string;
   password: string;
 }

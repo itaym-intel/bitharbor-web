@@ -17,8 +17,8 @@ import type {
   MediaDetail, 
   IngestRequest, 
   IngestResponse,
-  BitHarborAuthResponse,
-  BitHarborSetupRequest,
+  BitTempleAuthResponse,
+  BitTempleSetupRequest,
   Admin,
   Participant,
   ParticipantRole,
@@ -27,7 +27,7 @@ import type {
   CatalogDownloadResponse,
 } from '@/types/api';
 
-export class BitHarborAdapter {
+export class BitTempleAdapter {
   private baseUrl: string;
 
   constructor(baseUrl: string = 'http://localhost:8080/api/v1') {
@@ -50,7 +50,7 @@ export class BitHarborAdapter {
   }
 
   /**
-   * Transform BitHarbor MediaDetail to our MediaItem format
+   * Transform BitTemple MediaDetail to our MediaItem format
    */
   private transformMediaItem(detail: MediaDetail): MediaItem {
     const metadata = detail.metadata || {};
@@ -212,8 +212,8 @@ export class BitHarborAdapter {
     };
   }
 
-  /**
-   * Login to BitHarbor backend
+    /*
+       * Login to BitTemple backend
    */
   async login(email: string, password: string): Promise<{ accessToken: string; user: any; admin?: Admin; participants?: Participant[] }> {
     const response = await fetch(`${this.baseUrl}/auth/login`, {
@@ -226,7 +226,7 @@ export class BitHarborAdapter {
       throw new Error('Login failed');
     }
 
-    const data: BitHarborAuthResponse = await response.json();
+    const data: BitTempleAuthResponse = await response.json();
     return {
       accessToken: data.access_token,
       user: {
@@ -243,7 +243,7 @@ export class BitHarborAdapter {
    * First-time setup (creates admin account)
    */
   async setup(email: string, password: string, displayName: string, participants?: Participant[]): Promise<{ accessToken: string; admin: Admin; participants: Participant[] }> {
-    const request: BitHarborSetupRequest = {
+    const request: BitTempleSetupRequest = {
       email,
       password,
       display_name: displayName,
@@ -260,7 +260,7 @@ export class BitHarborAdapter {
       throw new Error('Setup failed');
     }
 
-    const data: BitHarborAuthResponse = await response.json();
+    const data: BitTempleAuthResponse = await response.json();
     return {
       accessToken: data.access_token,
       admin: data.admin,
@@ -678,6 +678,6 @@ export class BitHarborAdapter {
 
 // Export singleton instance with environment variable
 // @ts-ignore - Vite env variable
-const backendUrl = import.meta.env?.VITE_BITHARBOR_URL || 'http://localhost:8080/api/v1';
-console.log('🔧 BitHarborAdapter initialized with URL:', backendUrl);
-export const bitHarborAdapter = new BitHarborAdapter(backendUrl);
+const backendUrl = import.meta.env?.VITE_BITTEMPLE_URL || 'http://localhost:8080/api/v1';
+console.log('🔧 BitTempleAdapter initialized with URL:', backendUrl);
+export const bitTempleAdapter = new BitTempleAdapter(backendUrl);

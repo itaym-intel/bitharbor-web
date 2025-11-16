@@ -14,7 +14,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   
-  // New BitHarbor admin/participant support
+  // New BitTemple admin/participant support
   admin: Admin | null;
   participants: Participant[];
   currentDisplayName: string | null;
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     apiService.setAccessToken(token);
 
-    // New BitHarbor auth flow (email login with admin data)
+  // New BitTemple auth flow (email login with admin data)
     if (adminData) {
       setAdmin(JSON.parse(adminData));
       if (participantsData) {
@@ -124,11 +124,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // New BitHarbor login method
+  // New BitTemple login method
   const loginWithEmail = async (email: string, password: string) => {
     try {
-      // Use the BitHarbor adapter for authentication
-      const result = await apiService.bitHarborAdapter.login(email, password);
+      // Use the BitTemple adapter for authentication
+      const result = await apiService.bitTempleAdapter.login(email, password);
       
       // Save session with new format
       localStorage.setItem(TOKEN_KEY, result.accessToken);
@@ -174,7 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshAdminInfo = async () => {
     try {
-      const result = await apiService.bitHarborAdapter.getMe();
+      const result = await apiService.bitTempleAdapter.getMe();
       if (result.admin) {
         setAdmin(result.admin);
         localStorage.setItem(ADMIN_KEY, JSON.stringify(result.admin));

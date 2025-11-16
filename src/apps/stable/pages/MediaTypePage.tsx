@@ -15,7 +15,7 @@ import {
   Stack,
   SelectChangeEvent,
 } from '@mui/material';
-import { bitHarborAdapter } from '@/lib/api/bitharbor-adapter';
+import { bitTempleAdapter } from '@/lib/api/bittemple-adapter';
 import { MediaCard } from '@/components/cards/MediaCard';
 import { CatalogIngestPanel } from '@/components/catalog/CatalogIngestPanel';
 import type { MediaItem, MediaType } from '@/types/api';
@@ -38,7 +38,7 @@ export function MediaTypePage({ mediaType, title }: MediaTypePageProps) {
     queryKey: [mediaType],
     queryFn: async () => {
       try {
-        const result = await bitHarborAdapter.getMedia(mediaType);
+        const result = await bitTempleAdapter.getMedia(mediaType);
         return result.Items;
       } catch (err) {
         if (err instanceof Error && err.message.includes('404')) {

@@ -6,14 +6,14 @@
  */
 
 import { MediaApiService } from './api';
-import { BitHarborAdapter } from './bitharbor-adapter';
+import { BitTempleAdapter } from './bittemple-adapter';
 
-export type BackendType = 'mock' | 'bitharbor';
+export type BackendType = 'mock' | 'bittemple';
 
 export class UnifiedApiClient {
   private backendType: BackendType;
   private mockApi: MediaApiService;
-  private bitHarborApi: BitHarborAdapter;
+  private bitTempleApi: BitTempleAdapter;
 
   constructor() {
     // @ts-ignore - Vite env variable
@@ -22,7 +22,7 @@ export class UnifiedApiClient {
     const backendUrl = import.meta.env?.VITE_BITHARBOR_URL || 'http://localhost:8080/api/v1';
     
     this.mockApi = new MediaApiService();
-    this.bitHarborApi = new BitHarborAdapter(backendUrl);
+    this.bitTempleApi = new BitTempleAdapter(backendUrl);
 
     console.log(`🔧 API Client initialized with backend: ${this.backendType}`);
     console.log(`🌐 Backend URL: ${backendUrl}`);
@@ -41,9 +41,9 @@ export class UnifiedApiClient {
    * Smart search - uses vector search if BitHarbor, keyword search if mock
    */
   async search(query: string, limit = 20): Promise<any[]> {
-    if (this.backendType === 'bitharbor') {
-      console.log('🔍 [BitHarbor] Vector search:', query);
-      const result = await this.bitHarborApi.vectorSearch(query, undefined, { k: limit });
+    if (this.backendType === 'bittemple') {
+      console.log('🔍 [BitTemple] Vector search:', query);
+      const result = await this.bitTempleApi.vectorSearch(query, undefined, { k: limit });
       return result.items;
     } else {
       console.log('🔍 [Mock] Keyword search:', query);
@@ -52,15 +52,15 @@ export class UnifiedApiClient {
   }
 
   /**
-   * Advanced vector search (BitHarbor only)
+   * Advanced vector search (BitTemple only)
    * Returns items with similarity scores
    */
   async vectorSearch(
     query: string,
     options: { top_k?: number; threshold?: number } = {}
   ): Promise<{ items: any[]; scores: number[] }> {
-    if (this.backendType === 'bitharbor') {
-      return this.bitHarborApi.vectorSearch(query, undefined, { k: options.top_k });
+    if (this.backendType === 'bittemple') {
+      return this.bitTempleApi.vectorSearch(query, undefined, { k: options.top_k });
     } else {
       // Fallback to regular search, no scores
       const items = await this.mockApi.search(query, options.top_k);
@@ -69,13 +69,13 @@ export class UnifiedApiClient {
   }
 
   /**
-   * Get libraries (mock API only - BitHarbor doesn't have libraries concept)
+   * Get libraries (mock API only - BitTemple doesn't have libraries concept)
    */
   async getLibraries() {
     if (this.backendType === 'mock') {
       return this.mockApi.getLibraries();
     } else {
-      // BitHarbor: Create virtual "All Media" library
+      // BitTemple: Create virtual "All Media" library
       return [{
         Id: 'all-media',
         Name: 'All Media',
@@ -91,8 +91,8 @@ export class UnifiedApiClient {
     if (this.backendType === 'mock') {
       return this.mockApi.getLibraryItems(libraryId, options);
     } else {
-      // BitHarbor: Get all media (no library filtering)
-      const result = await this.bitHarborApi.getMedia(null);
+      // BitTemple: Get all media (no library filtering)
+      const result = await this.bitTempleApi.getMedia(null);
       return {
         items: result.Items,
         totalCount: result.TotalRecordCount,
@@ -107,7 +107,7 @@ export class UnifiedApiClient {
     if (this.backendType === 'mock') {
       return this.mockApi.getItemById(itemId);
     } else {
-      return this.bitHarborApi.getMediaById(itemId);
+      return this.bitTempleApi.getMediaById(itemId);
     }
   }
 
@@ -118,8 +118,8 @@ export class UnifiedApiClient {
     if (this.backendType === 'mock') {
       return this.mockApi.getContinueWatching(limit);
     } else {
-      // BitHarbor: Get recent media as fallback
-      const result = await this.bitHarborApi.getMedia(null);
+      // BitTemple: Get recent media as fallback
+      const result = await this.bitTempleApi.getMedia(null);
       return result.Items;
     }
   }
@@ -131,7 +131,7 @@ export class UnifiedApiClient {
     if (this.backendType === 'mock') {
       return this.mockApi.getRecentlyAdded(limit);
     } else {
-      const result = await this.bitHarborApi.getMedia(null);
+      const result = await this.bitTempleApi.getMedia(null);
       return result.Items;
     }
   }
@@ -217,9 +217,9 @@ export class UnifiedApiClient {
       // Mock: return dummy URL
       return `http://localhost:8096/Videos/${itemId}/stream.mp4`;
     } else {
-      // BitHarbor: stream URL requires media type, but we don't have it here
+      // BitTemple: stream URL requires media type, but we don't have it here
       // This is a limitation - in real usage, we should pass the item's type
-      return this.bitHarborApi.getStreamUrl(itemId, undefined);
+      return this.bitTempleApi.getStreamUrl(itemId, undefined);
     }
   }
 }
