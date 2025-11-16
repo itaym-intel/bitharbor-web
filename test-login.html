@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Mock API Login</title>
+</head>
+<body>
+    <h1>Mock API Login Test</h1>
+    <div id="output"></div>
+    
+    <script>
+        const output = document.getElementById('output');
+        
+        async function testLogin() {
+            output.innerHTML += '<h2>Testing Login...</h2>';
+            
+            try {
+                // Test 1: Login
+                output.innerHTML += '<p>🔐 Attempting login with demo/demo...</p>';
+                const loginResponse = await fetch('http://localhost:8096/Users/AuthenticateByName', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        Username: 'demo',
+                        Pw: 'demo'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                output.innerHTML += `<p>✅ Login response: ${JSON.stringify(loginData, null, 2)}</p>`;
+                
+                const token = loginData.AccessToken;
+                const userId = loginData.User.Id;
+                
+                // Test 2: Get Libraries
+                output.innerHTML += `<p>📚 Fetching libraries with token: ${token}...</p>`;
+                const libResponse = await fetch(`http://localhost:8096/Users/${userId}/Views`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    }
+                });
+                
+                const libData = await libResponse.json();
+                output.innerHTML += `<p>✅ Libraries: ${JSON.stringify(libData, null, 2)}</p>`;
+                
+                // Test 3: Get Library Items
+                if (libData.Items && libData.Items.length > 0) {
+                    const firstLib = libData.Items[0];
+                    output.innerHTML += `<p>🎬 Fetching items from library: ${firstLib.Name}...</p>`;
+                    
+                    const itemsResponse = await fetch(`http://localhost:8096/Users/${userId}/Items?ParentId=${firstLib.Id}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+                    
+                    const itemsData = await itemsResponse.json();
+                    output.innerHTML += `<p>✅ Items in ${firstLib.Name}: ${itemsData.TotalRecordCount} items</p>`;
+                    output.innerHTML += `<pre>${JSON.stringify(itemsData, null, 2)}</pre>`;
+                }
+                
+            } catch (error) {
+                output.innerHTML += `<p style="color: red;">❌ Error: ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+        
+        // Run test on page load
+        testLogin();
+    </script>
+</body>
+</html>

@@ -2,9 +2,9 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { apiService } from '@/lib/api/client';
 import type { User, AuthResponse } from '@/types/api';
 
-const TOKEN_KEY = 'jellyfin_token';
-const USER_KEY = 'jellyfin_user';
-const SERVER_KEY = 'jellyfin_server';
+const TOKEN_KEY = 'access_token';
+const USER_KEY = 'user_data';
+const SERVER_KEY = 'server_url';
 
 interface AuthContextType {
   user: User | null;
@@ -49,12 +49,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Connect to server
       await apiService.connect(serverUrl);
       
-      // Authenticate
+      // Authenticate - Python FastAPI backend uses simple JSON auth
       const response = await fetch(`${serverUrl}/Users/AuthenticateByName`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Emby-Authorization': `MediaBrowser Client="Jellyfin Dupe", Device="Web Browser", DeviceId="${crypto.randomUUID()}", Version="0.1.0"`,
         },
         body: JSON.stringify({
           Username: username,
