@@ -28,6 +28,7 @@ import {
   Photo as PersonalIcon,
   Search as SearchIcon,
   AccountCircle,
+  CloudDownload as CloudDownloadIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -80,6 +81,7 @@ export function MainLayout({ children }: MainLayoutProps) {
     { text: 'Podcasts', icon: <PodcastIcon />, path: '/podcasts' },
     { text: 'Videos', icon: <VideoIcon />, path: '/videos' },
     { text: 'Personal', icon: <PersonalIcon />, path: '/personal' },
+    { text: 'Ingest', icon: <CloudDownloadIcon />, path: '/ingest' },
   ];
 
   const drawer = (
@@ -131,50 +133,52 @@ export function MainLayout({ children }: MainLayoutProps) {
             <MenuIcon />
           </IconButton>
           
-          {/* Search Bar */}
-          <Box
-            component="form"
-            onSubmit={handleSearch}
-            sx={{
-              position: 'relative',
-              borderRadius: 1,
-              backgroundColor: alpha('#ffffff', 0.15),
-              '&:hover': {
-                backgroundColor: alpha('#ffffff', 0.25),
-              },
-              marginRight: 2,
-              marginLeft: 0,
-              width: '100%',
-              maxWidth: 400,
-            }}
-          >
+          {/* Search Bar: Only show on non-Home pages */}
+          {location.pathname !== '/' && (
             <Box
+              component="form"
+              onSubmit={handleSearch}
               sx={{
-                padding: '0 16px',
-                height: '100%',
-                position: 'absolute',
-                pointerEvents: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                position: 'relative',
+                borderRadius: 1,
+                backgroundColor: alpha('#ffffff', 0.15),
+                '&:hover': {
+                  backgroundColor: alpha('#ffffff', 0.25),
+                },
+                marginRight: 2,
+                marginLeft: 0,
+                width: '100%',
+                maxWidth: 400,
               }}
             >
-              <SearchIcon />
+              <Box
+                sx={{
+                  padding: '0 16px',
+                  height: '100%',
+                  position: 'absolute',
+                  pointerEvents: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <SearchIcon />
+              </Box>
+              <InputBase
+                placeholder="Search…"
+                inputProps={{ 'aria-label': 'search' }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                sx={{
+                  color: 'inherit',
+                  width: '100%',
+                  '& .MuiInputBase-input': {
+                    padding: '8px 8px 8px 48px',
+                  },
+                }}
+              />
             </Box>
-            <InputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              sx={{
-                color: 'inherit',
-                width: '100%',
-                '& .MuiInputBase-input': {
-                  padding: '8px 8px 8px 48px',
-                },
-              }}
-            />
-          </Box>
+          )}
 
           <Box sx={{ flexGrow: 1 }} />
 

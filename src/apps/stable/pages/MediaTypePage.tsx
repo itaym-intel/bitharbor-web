@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { SearchBar } from '@/components/common/SearchBar';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -24,47 +25,53 @@ interface MediaTypePageProps {
   libraryId: string;
 }
 
-export function MediaTypePage({ mediaType, title, libraryId }: MediaTypePageProps) {
+export function MediaTypePage({ mediaType, title }: MediaTypePageProps) {
   const navigate = useNavigate();
-  
   const [sortBy, setSortBy] = useState<'SortName' | 'PremiereDate' | 'CommunityRating'>('SortName');
   const [sortOrder, setSortOrder] = useState<'Ascending' | 'Descending'>('Ascending');
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [searchResults, setSearchResults] = useState<MediaItem[] | null>(null);
 
-  // Fetch media items for this media type - reuse same query key as Home page
-  const { data: items, isLoading, error } = useQuery({
-    queryKey: [mediaType], // Same key as Home.tsx so data is shared
+  // Fetch media items for this media type
+  const { data: items, isLoading } = useQuery({
+    queryKey: [mediaType],
     queryFn: async () => {
       try {
-        const result = await bitHarborAdapter.getMedia(mediaType, { limit: 1000, offset: 0 });
+        const result = await bitHarborAdapter.getMedia(mediaType);
         return result.Items;
       } catch (err) {
-        // Handle 404 gracefully (no media of this type yet)
         if (err instanceof Error && err.message.includes('404')) {
           return [];
         }
         throw err;
       }
     },
+    staleTime: Infinity,
+    gcTime: Infinity,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
-  // Client-side filtering and sorting
+  // Use search results if present, otherwise use all items
   const filteredAndSortedItems = useMemo(() => {
-    if (!items) return [];
-
-    let filteredItems = [...items];
-
-    // Filter by genre
+    let baseItems: MediaItem[] = [];
+    if (searchResults && items) {
+      // Map search result IDs to full items from the already-fetched items
+      const itemsById = new Map(items.map(item => [item.Id, item]));
+      baseItems = searchResults
+        .map(result => itemsById.get(result.Id))
+        .filter((item): item is MediaItem => !!item);
+    } else {
+      baseItems = items || [];
+    }
+    let filteredItems = [...baseItems];
     if (selectedGenres.length > 0) {
       filteredItems = filteredItems.filter((item: MediaItem) =>
         item.Genres?.some(genre => selectedGenres.includes(genre))
       );
     }
-
-    // Sort items
     filteredItems.sort((a: MediaItem, b: MediaItem) => {
       let compareResult = 0;
-
       switch (sortBy) {
         case 'SortName':
           compareResult = (a.Name || '').localeCompare(b.Name || '');
@@ -80,17 +87,14 @@ export function MediaTypePage({ mediaType, title, libraryId }: MediaTypePageProp
         default:
           compareResult = (a.Name || '').localeCompare(b.Name || '');
       }
-
       return sortOrder === 'Descending' ? -compareResult : compareResult;
     });
-
     return filteredItems;
-  }, [items, selectedGenres, sortBy, sortOrder]);
+  }, [items, searchResults, selectedGenres, sortBy, sortOrder]);
 
   // Extract unique genres from all items (not filtered)
   const availableGenres = useMemo(() => {
     if (!items) return [];
-    
     return Array.from(
       new Set(
         items
@@ -140,6 +144,9 @@ export function MediaTypePage({ mediaType, title, libraryId }: MediaTypePageProp
           {selectedGenres.length > 0 && ` (filtered from ${items?.length || 0})`}
         </Typography>
       </Box>
+
+      {/* Search Bar */}
+      <SearchBar mediaType={mediaType} onResults={setSearchResults} />
 
       {/* Controls */}
       <Box sx={{ mb: 4 }}>

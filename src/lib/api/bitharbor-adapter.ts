@@ -22,6 +22,9 @@ import type {
   Admin,
   Participant,
   ParticipantRole,
+  CatalogMatchResponse,
+  CatalogDownloadRequest,
+  CatalogDownloadResponse,
 } from '@/types/api';
 
 export class BitHarborAdapter {
@@ -355,25 +358,19 @@ export class BitHarborAdapter {
    */
   async getMedia(
     type: MediaType | null,
-    params?: {
-      limit?: number;
-      offset?: number;
-    }
   ): Promise<{ Items: MediaItem[]; TotalRecordCount: number }> {
     // If no type specified, query all types and combine
     if (type === null) {
       const allTypes: MediaType[] = ['movie', 'tv', 'music', 'podcast', 'video', 'personal'];
       const results = await Promise.all(
-        allTypes.map(t => this.getMedia(t, params))
+        allTypes.map(t => this.getMedia(t))
       );
       
       // Combine and flatten results
       const allItems = results.flatMap(r => r.Items);
-      const limit = params?.limit || 50;
-      const offset = params?.offset || 0;
       
       return {
-        Items: allItems.slice(offset, offset + limit),
+        Items: allItems,
         TotalRecordCount: results.reduce((sum, r) => sum + r.TotalRecordCount, 0),
       };
     }
@@ -556,6 +553,53 @@ export class BitHarborAdapter {
   }
 
   /**
+   * Search upstream catalog (TMDb + Internet Archive) for movies not yet ingested
+   */
+  async searchCatalogMovies(
+    query: string,
+    options: { limit?: number; year?: number } = {}
+  ): Promise<CatalogMatchResponse> {
+    const params = new URLSearchParams({ query });
+    const limit = options.limit ?? 10;
+    params.set('limit', limit.toString());
+    if (options.year) {
+      params.set('year', options.year.toString());
+    }
+
+    const response = await fetch(`${this.baseUrl}/movies/catalog/search?${params.toString()}`, {
+      headers: this.getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error('Catalog search failed');
+    }
+
+    return await response.json();
+  }
+
+  /**
+   * Trigger catalog download for a movie match key (plan or execute)
+   */
+  async downloadCatalogMovie(request: CatalogDownloadRequest): Promise<CatalogDownloadResponse> {
+    const payload: CatalogDownloadRequest = {
+      match_key: request.match_key,
+      execute: request.execute ?? true,
+    };
+
+    const response = await fetch(`${this.baseUrl}/movies/catalog/download`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error('Catalog download failed');
+    }
+
+    return await response.json();
+  }
+
+  /**
    * Get stream URL for media playback
    */
   getStreamUrl(mediaId: string, type?: MediaType): string {
@@ -571,6 +615,14 @@ export class BitHarborAdapter {
 
   /**
    * Ingest new media file
+   * 
+   * NOTE: After ingesting media, you should invalidate the React Query cache
+   * for the corresponding media type to ensure the UI reflects the new data:
+   * 
+   * ```typescript
+   * await bitHarborAdapter.ingestMedia(...);
+   * queryClient.invalidateQueries({ queryKey: [mediaType] });
+   * ```
    */
   async ingestMedia(
     type: MediaType,

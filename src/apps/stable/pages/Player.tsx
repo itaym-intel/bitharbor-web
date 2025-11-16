@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Box, CircularProgress, Alert } from '@mui/material';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
-import { apiClient } from '@/lib/api/api';
+import { unifiedApiClient } from '@/lib/api/unified-client';
 
 export function Player() {
   const { id } = useParams<{ id: string }>();
@@ -10,17 +10,17 @@ export function Player() {
 
   const { data: item, isLoading, error } = useQuery({
     queryKey: ['item', id],
-    queryFn: () => apiClient.getItemById(id!),
+    queryFn: () => unifiedApiClient.getItemById(id!),
     enabled: !!id,
   });
 
   const reportProgressMutation = useMutation({
     mutationFn: ({ position, isPaused }: { position: number; isPaused: boolean }) =>
-      apiClient.reportPlaybackProgress(id!, position, isPaused),
+      unifiedApiClient.reportPlaybackProgress(id!, position, isPaused),
   });
 
   const reportStoppedMutation = useMutation({
-    mutationFn: (position: number) => apiClient.reportPlaybackStopped(id!, position),
+    mutationFn: (position: number) => unifiedApiClient.reportPlaybackStopped(id!, position),
   });
 
   const handleProgressUpdate = (position: number) => {
@@ -29,14 +29,14 @@ export function Player() {
 
     // Mark as watched at 90%
     if (item && position >= item.RunTimeTicks! / 10000000 * 0.9) {
-      apiClient.markAsPlayed(id!);
+      unifiedApiClient.markAsPlayed(id!);
     }
   };
 
   const handlePlaybackEnd = () => {
     if (item) {
       reportStoppedMutation.mutate(item.RunTimeTicks! / 10000000);
-      apiClient.markAsPlayed(id!);
+      unifiedApiClient.markAsPlayed(id!);
     }
     navigate(-1); // Go back to previous page
   };

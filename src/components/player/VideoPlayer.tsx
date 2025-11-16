@@ -66,7 +66,6 @@ export function VideoPlayer({
   const backendUrl = import.meta.env?.VITE_BITHARBOR_URL || 'http://localhost:8080/api/v1';
   // Construct stream URL with file_hash as query parameter
   const streamUrl = `${backendUrl}/${typeRoute}/stream?file_hash=${itemId}`;
-  const token = localStorage.getItem('access_token');
 
   // Sync video element with state
   useEffect(() => {

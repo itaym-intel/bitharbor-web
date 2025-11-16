@@ -14,7 +14,7 @@ import {
   Stack,
   SelectChangeEvent,
 } from '@mui/material';
-import { apiClient } from '@/lib/api/api';
+import { unifiedApiClient } from '@/lib/api/unified-client';
 import { MediaCard } from '@/components/cards/MediaCard';
 import type { MediaItem } from '@/types/api';
 
@@ -29,7 +29,7 @@ export function LibraryDetail() {
   // Fetch library info
   const { data: libraries } = useQuery({
     queryKey: ['libraries'],
-    queryFn: () => apiClient.getLibraries(),
+    queryFn: () => unifiedApiClient.getLibraries(),
   });
 
   const currentLibrary = libraries?.find(lib => lib.Id === id);
@@ -38,7 +38,7 @@ export function LibraryDetail() {
   const { data: libraryData, isLoading } = useQuery({
     queryKey: ['libraryItems', id, sortBy, sortOrder, selectedGenres],
     queryFn: () =>
-      apiClient.getLibraryItems(id!, {
+      unifiedApiClient.getLibraryItems(id!, {
         sortBy,
         sortOrder,
         genres: selectedGenres.length > 0 ? selectedGenres : undefined,

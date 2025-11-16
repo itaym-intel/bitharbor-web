@@ -92,10 +92,7 @@ export class UnifiedApiClient {
       return this.mockApi.getLibraryItems(libraryId, options);
     } else {
       // BitHarbor: Get all media (no library filtering)
-      const result = await this.bitHarborApi.getMedia(null, {
-        limit: options.limit || 50,
-        offset: options.startIndex || 0,
-      });
+      const result = await this.bitHarborApi.getMedia(null);
       return {
         items: result.Items,
         totalCount: result.TotalRecordCount,
@@ -122,7 +119,7 @@ export class UnifiedApiClient {
       return this.mockApi.getContinueWatching(limit);
     } else {
       // BitHarbor: Get recent media as fallback
-      const result = await this.bitHarborApi.getMedia(null, { limit });
+      const result = await this.bitHarborApi.getMedia(null);
       return result.Items;
     }
   }
@@ -134,7 +131,7 @@ export class UnifiedApiClient {
     if (this.backendType === 'mock') {
       return this.mockApi.getRecentlyAdded(limit);
     } else {
-      const result = await this.bitHarborApi.getMedia(null, { limit });
+      const result = await this.bitHarborApi.getMedia(null);
       return result.Items;
     }
   }

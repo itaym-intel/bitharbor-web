@@ -9,10 +9,6 @@ import {
   Paper,
   Grid,
   IconButton,
-  Link,
-  Divider,
-  Card,
-  CardContent,
   Stack,
 } from '@mui/material';
 import {
@@ -20,10 +16,9 @@ import {
   Favorite as FavoriteIcon,
   FavoriteBorder as FavoriteBorderIcon,
   ArrowBack as ArrowBackIcon,
-  Language as WebIcon,
   Star as StarIcon,
 } from '@mui/icons-material';
-import { apiClient } from '@/lib/api/api';
+import { unifiedApiClient } from '@/lib/api/unified-client';
 import type { MediaItem } from '@/types/api';
 
 export function ItemDetail() {
@@ -66,7 +61,7 @@ export function ItemDetail() {
   const toggleFavoriteMutation = useMutation({
     mutationFn: async () => {
       if (!item) return false;
-      return apiClient.toggleFavorite(item.Id, item.UserData?.IsFavorite || false);
+      return unifiedApiClient.toggleFavorite(item.Id, item.UserData?.IsFavorite || false);
     },
     onSuccess: () => {
       // Invalidate queries to refetch data

@@ -303,6 +303,71 @@ export interface MediaListResponse {
   total: number;
 }
 
+export interface CatalogMovieDetails {
+  title: string;
+  tagline?: string | null;
+  overview?: string | null;
+  release_date?: string | null;
+  year?: number | null;
+  runtime_min?: number | null;
+  genres?: string[] | null;
+  languages?: string[] | null;
+  vote_average?: number | null;
+  vote_count?: number | null;
+  cast?: string[] | null;
+  rating?: string | null;
+  catalog_source?: string | null;
+  catalog_id?: string | null;
+  poster?: ImageMetadata | null;
+  backdrop?: ImageMetadata | null;
+}
+
+export interface CatalogMatchCandidate {
+  identifier: string;
+  score: number | null;
+  downloads: number | null;
+  catalog_source?: string | null;
+  catalog_id?: string | null;
+  movie?: CatalogMovieDetails | null;
+}
+
+export interface CatalogMatch {
+  match_key: string;
+  tmdb_id: number;
+  tmdb_movie: CatalogMovieDetails;
+  best_candidate: CatalogMatchCandidate;
+  candidates: CatalogMatchCandidate[];
+}
+
+export interface CatalogMatchResponse {
+  matches: CatalogMatch[];
+  total: number;
+}
+
+export interface CatalogDownloadRequest {
+  match_key: string;
+  execute?: boolean;
+}
+
+export interface CatalogDownloadResponse {
+  match_key: string;
+  identifier: string;
+  title: string;
+  destination: string | null;
+  video_file?: string | null;
+  metadata_xml_file?: string | null;
+  cover_art_file?: string | null;
+  subtitle_files?: string[] | null;
+  downloaded: boolean;
+  video_path?: string | null;
+  subtitle_paths?: string[] | null;
+  file_hash?: string | null;
+  vector_hash?: string | null;
+  vector_row_id?: number | null;
+  movie_id?: number | null;
+  created?: boolean | null;
+}
+
 export interface MediaDetail {
   media_id: string;
   type: MediaType;
