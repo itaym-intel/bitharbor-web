@@ -20,8 +20,12 @@ import {
 import {
   Menu as MenuIcon,
   Home as HomeIcon,
-  VideoLibrary as VideoLibraryIcon,
-  Favorite as FavoriteIcon,
+  Movie as MovieIcon,
+  Tv as TvIcon,
+  LibraryMusic as MusicIcon,
+  Podcasts as PodcastIcon,
+  VideoLibrary as VideoIcon,
+  Photo as PersonalIcon,
   Search as SearchIcon,
   AccountCircle,
 } from '@mui/icons-material';
@@ -70,8 +74,12 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   const navItems = [
     { text: 'Home', icon: <HomeIcon />, path: '/' },
-    { text: 'Libraries', icon: <VideoLibraryIcon />, path: '/libraries' },
-    { text: 'Favorites', icon: <FavoriteIcon />, path: '/favorites' },
+    { text: 'Movies', icon: <MovieIcon />, path: '/movies' },
+    { text: 'TV Shows', icon: <TvIcon />, path: '/tv' },
+    { text: 'Music', icon: <MusicIcon />, path: '/music' },
+    { text: 'Podcasts', icon: <PodcastIcon />, path: '/podcasts' },
+    { text: 'Videos', icon: <VideoIcon />, path: '/videos' },
+    { text: 'Personal', icon: <PersonalIcon />, path: '/personal' },
   ];
 
   const drawer = (

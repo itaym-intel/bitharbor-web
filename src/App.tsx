@@ -7,6 +7,12 @@ import { ItemDetail } from './apps/stable/pages/ItemDetail';
 import { Libraries } from './apps/stable/pages/Libraries';
 import { LibraryDetail } from './apps/stable/pages/LibraryDetail';
 import { Favorites } from './apps/stable/pages/Favorites';
+import { Movies } from './apps/stable/pages/Movies';
+import { TVShows } from './apps/stable/pages/TVShows';
+import { Music } from './apps/stable/pages/Music';
+import { Podcasts } from './apps/stable/pages/Podcasts';
+import { Videos } from './apps/stable/pages/Videos';
+import { Personal } from './apps/stable/pages/Personal';
 import { Player } from './apps/stable/pages/Player';
 import { Search } from './apps/stable/pages/Search';
 import { Settings } from './apps/stable/pages/Settings';
@@ -79,6 +85,66 @@ function AppRoutes() {
           <ProtectedRoute>
             <MainLayout>
               <LibraryDetail />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/movies"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Movies />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/tv"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <TVShows />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/music"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Music />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/podcasts"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Podcasts />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/videos"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Videos />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/personal"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <Personal />
             </MainLayout>
           </ProtectedRoute>
         }
