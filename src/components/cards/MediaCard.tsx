@@ -1,6 +1,6 @@
 import { Card, CardMedia, CardContent, Typography, LinearProgress, Box, Chip } from '@mui/material';
-import { jellyfinApi } from '@/lib/jellyfin/api';
-import type { MediaItem } from '@/types/jellyfin';
+import { apiClient } from '@/lib/api/api';
+import type { MediaItem } from '@/types/api';
 
 interface MediaCardProps {
   item: MediaItem;
@@ -9,7 +9,7 @@ interface MediaCardProps {
 
 export function MediaCard({ item, onClick }: MediaCardProps) {
   const imageUrl = item.ImageTags?.Primary
-    ? jellyfinApi.getImageUrl(item.Id, 'Primary', 300)
+    ? apiClient.getImageUrl(item.Id, 'Primary', 300)
     : undefined;
 
   const progress =

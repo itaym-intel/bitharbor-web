@@ -1,7 +1,7 @@
 import { Box, CircularProgress } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { jellyfinApi } from '@/lib/jellyfin/api';
+import { apiClient } from '@/lib/api/api';
 import { MediaRow } from '@/components/cards/MediaRow';
 
 export function Home() {
@@ -9,17 +9,17 @@ export function Home() {
 
   const { data: continueWatching, isLoading: loadingContinue } = useQuery({
     queryKey: ['continueWatching'],
-    queryFn: () => jellyfinApi.getContinueWatching(),
+    queryFn: () => apiClient.getContinueWatching(),
   });
 
   const { data: recentlyAdded, isLoading: loadingRecent } = useQuery({
     queryKey: ['recentlyAdded'],
-    queryFn: () => jellyfinApi.getRecentlyAdded(),
+    queryFn: () => apiClient.getRecentlyAdded(),
   });
 
   const { data: favorites, isLoading: loadingFavorites } = useQuery({
     queryKey: ['favorites'],
-    queryFn: () => jellyfinApi.getFavorites(),
+    queryFn: () => apiClient.getFavorites(),
   });
 
   const handleItemClick = (item: any) => {

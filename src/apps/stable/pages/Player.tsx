@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Box, CircularProgress, Alert } from '@mui/material';
 import { VideoPlayer } from '@/components/player/VideoPlayer';
-import { jellyfinApi } from '@/lib/jellyfin/api';
+import { apiClient } from '@/lib/api/api';
 
 export function Player() {
   const { id } = useParams<{ id: string }>();
@@ -10,17 +10,17 @@ export function Player() {
 
   const { data: item, isLoading, error } = useQuery({
     queryKey: ['item', id],
-    queryFn: () => jellyfinApi.getItemById(id!),
+    queryFn: () => apiClient.getItemById(id!),
     enabled: !!id,
   });
 
   const reportProgressMutation = useMutation({
     mutationFn: ({ position, isPaused }: { position: number; isPaused: boolean }) =>
-      jellyfinApi.reportPlaybackProgress(id!, position, isPaused),
+      apiClient.reportPlaybackProgress(id!, position, isPaused),
   });
 
   const reportStoppedMutation = useMutation({
-    mutationFn: (position: number) => jellyfinApi.reportPlaybackStopped(id!, position),
+    mutationFn: (position: number) => apiClient.reportPlaybackStopped(id!, position),
   });
 
   const handleProgressUpdate = (position: number) => {
@@ -28,14 +28,14 @@ export function Player() {
 
     // Mark as watched at 90%
     if (item && position >= item.RunTimeTicks! / 10000000 * 0.9) {
-      jellyfinApi.markAsPlayed(id!);
+      apiClient.markAsPlayed(id!);
     }
   };
 
   const handlePlaybackEnd = () => {
     if (item) {
       reportStoppedMutation.mutate(item.RunTimeTicks! / 10000000);
-      jellyfinApi.markAsPlayed(id!);
+      apiClient.markAsPlayed(id!);
     }
     navigate(-1); // Go back to previous page
   };

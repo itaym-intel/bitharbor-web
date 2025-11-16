@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { jellyfinClient } from '@/lib/jellyfin/client';
-import type { User, AuthResponse } from '@/types/jellyfin';
+import { apiService } from '@/lib/api/client';
+import type { User, AuthResponse } from '@/types/api';
 
 const TOKEN_KEY = 'jellyfin_token';
 const USER_KEY = 'jellyfin_user';
@@ -28,8 +28,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (token && userData && serverUrl) {
       setUser(JSON.parse(userData));
-      jellyfinClient.connect(serverUrl).then(() => {
-        jellyfinClient.setAccessToken(token);
+      apiService.connect(serverUrl).then(() => {
+        apiService.setAccessToken(token);
       }).catch(() => {
         // Clear invalid session
         localStorage.removeItem(TOKEN_KEY);
@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (serverUrl: string, username: string, password: string) => {
     try {
       // Connect to server
-      await jellyfinClient.connect(serverUrl);
+      await apiService.connect(serverUrl);
       
       // Authenticate
       const response = await fetch(`${serverUrl}/Users/AuthenticateByName`, {
@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(USER_KEY, JSON.stringify(data.User));
       localStorage.setItem(SERVER_KEY, serverUrl);
       
-      jellyfinClient.setAccessToken(data.AccessToken);
+      apiService.setAccessToken(data.AccessToken);
       setUser(data.User);
       
       return data.User;

@@ -1,7 +1,7 @@
 import { Box, Typography, Grid, Card, CardContent, CardMedia } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { jellyfinApi } from '@/lib/jellyfin/api';
+import { apiClient } from '@/lib/api/api';
 import { VideoLibrary as VideoLibraryIcon } from '@mui/icons-material';
 
 export function Libraries() {
@@ -9,14 +9,14 @@ export function Libraries() {
   
   const { data: libraries, isLoading } = useQuery({
     queryKey: ['libraries'],
-    queryFn: () => jellyfinApi.getLibraries(),
+    queryFn: () => apiClient.getLibraries(),
   });
 
   // Fetch item counts for each library
   const { data: movieCount } = useQuery({
     queryKey: ['libraryCount', 'mock-library-movies'],
     queryFn: async () => {
-      const result = await jellyfinApi.getLibraryItems('mock-library-movies', { limit: 1 });
+      const result = await apiClient.getLibraryItems('mock-library-movies', { limit: 1 });
       return result.totalCount;
     },
   });
@@ -24,7 +24,7 @@ export function Libraries() {
   const { data: tvCount } = useQuery({
     queryKey: ['libraryCount', 'mock-library-tvshows'],
     queryFn: async () => {
-      const result = await jellyfinApi.getLibraryItems('mock-library-tvshows', { limit: 1 });
+      const result = await apiClient.getLibraryItems('mock-library-tvshows', { limit: 1 });
       return result.totalCount;
     },
   });
@@ -32,7 +32,7 @@ export function Libraries() {
   const { data: musicCount } = useQuery({
     queryKey: ['libraryCount', 'mock-library-music'],
     queryFn: async () => {
-      const result = await jellyfinApi.getLibraryItems('mock-library-music', { limit: 1 });
+      const result = await apiClient.getLibraryItems('mock-library-music', { limit: 1 });
       return result.totalCount;
     },
   });

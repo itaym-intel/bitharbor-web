@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { MediaCard } from './MediaCard';
-import type { MediaItem } from '@/types/jellyfin';
+import type { MediaItem } from '@/types/api';
 
 interface MediaRowProps {
   title: string;

@@ -14,22 +14,62 @@ import { generatePosterSVG, generateBackdropSVG } from './images';
 
 const MOCK_SERVER_URL = 'http://localhost:8096';
 
+// Helper function to validate Bearer token (mimics Python FastAPI auth)
+function validateBearerToken(request: Request): boolean {
+  const authHeader = request.headers.get('Authorization');
+  if (!authHeader) {
+    console.warn('⚠️ [MSW] No Authorization header');
+    return false;
+  }
+  
+  // Check for Bearer token format
+  if (!authHeader.startsWith('Bearer ')) {
+    console.warn('⚠️ [MSW] Invalid auth format, expected Bearer token');
+    return false;
+  }
+  
+  const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+  
+  // In mock, accept the mock token
+  if (token === mockAccessToken) {
+    return true;
+  }
+  
+  console.warn('⚠️ [MSW] Invalid token');
+  return false;
+}
+
 export const handlers = [
-  // Authentication endpoint
+  // Root endpoint - Python backend will have this
+  http.get(`${MOCK_SERVER_URL}/`, () => {
+    console.log('🏠 [MSW] Root endpoint hit');
+    return HttpResponse.json({
+      message: 'BitHarbor Media Server (Mock)',
+      version: '1.0.0',
+      status: 'running',
+    });
+  }),
+
+  // Health check endpoint - Common for FastAPI
+  http.get(`${MOCK_SERVER_URL}/health`, () => {
+    return HttpResponse.json({ status: 'healthy' });
+  }),
+
+  // Authentication endpoint - Matches Python FastAPI format
   http.post(`${MOCK_SERVER_URL}/Users/AuthenticateByName`, async ({ request }) => {
     console.log('🔐 [MSW] Authentication request intercepted');
     const body = await request.json() as any;
     console.log('📝 [MSW] Login attempt:', { username: body.Username, hasPassword: !!body.Pw });
     
     if (body.Username && body.Pw !== undefined) {
-      console.log('[MSW] Authentication successful');
+      console.log('✅ [MSW] Authentication successful');
       return HttpResponse.json({
         User: mockUser,
         SessionInfo: {
           Id: 'mock-session-id',
           UserId: mockUser.Id,
         },
-        AccessToken: mockAccessToken,
+        AccessToken: mockAccessToken, // JWT token (Python will return JWT)
         ServerId: mockUser.ServerId,
       });
     }
@@ -41,29 +81,59 @@ export const handlers = [
     );
   }),
 
-  // Get user views (libraries)
-  http.get(`${MOCK_SERVER_URL}/Users/:userId/Views`, () => {
+  // Get user views (libraries) - Protected endpoint
+  http.get(`${MOCK_SERVER_URL}/Users/:userId/Views`, ({ request }) => {
+    // Python FastAPI will validate JWT token here
+    if (!validateBearerToken(request)) {
+      return HttpResponse.json(
+        { detail: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+    
+    console.log('📚 [MSW] Returning libraries');
     return HttpResponse.json({
       Items: mockLibraries,
       TotalRecordCount: mockLibraries.length,
     });
   }),
 
-  // Get continue watching (resume items)
-  http.get(`${MOCK_SERVER_URL}/Users/:userId/Items/Resume`, () => {
+  // Get continue watching (resume items) - Protected endpoint
+  http.get(`${MOCK_SERVER_URL}/Users/:userId/Items/Resume`, ({ request }) => {
+    if (!validateBearerToken(request)) {
+      return HttpResponse.json(
+        { detail: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+    
     return HttpResponse.json({
       Items: mockContinueWatching,
       TotalRecordCount: mockContinueWatching.length,
     });
   }),
 
-  // Get recently added (latest items)
-  http.get(`${MOCK_SERVER_URL}/Users/:userId/Items/Latest`, () => {
+  // Get recently added (latest items) - Protected endpoint
+  http.get(`${MOCK_SERVER_URL}/Users/:userId/Items/Latest`, ({ request }) => {
+    if (!validateBearerToken(request)) {
+      return HttpResponse.json(
+        { detail: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+    
     return HttpResponse.json(mockRecentlyAdded);
   }),
 
-  // Get favorite items
+  // Get favorite items or library items - Protected endpoint
   http.get(`${MOCK_SERVER_URL}/Users/:userId/Items`, ({ request }) => {
+    if (!validateBearerToken(request)) {
+      return HttpResponse.json(
+        { detail: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+    
     const url = new URL(request.url);
     const filters = url.searchParams.get('Filters');
     
@@ -137,8 +207,15 @@ export const handlers = [
     });
   }),
 
-  // Get single item by ID
-  http.get(`${MOCK_SERVER_URL}/Users/:userId/Items/:itemId`, ({ params }) => {
+  // Get single item by ID - Protected endpoint
+  http.get(`${MOCK_SERVER_URL}/Users/:userId/Items/:itemId`, ({ request, params }) => {
+    if (!validateBearerToken(request)) {
+      return HttpResponse.json(
+        { detail: 'Not authenticated' },
+        { status: 401 }
+      );
+    }
+    
     const { itemId } = params;
     console.log('🎬 [MSW] Item detail request:', itemId);
     

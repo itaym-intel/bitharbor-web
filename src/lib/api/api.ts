@@ -1,24 +1,30 @@
-import { jellyfinClient } from './client';
-import type { Library, MediaItem } from '@/types/jellyfin';
+import { apiService } from './client';
+import type { Library, MediaItem } from '@/types/api';
 
-export class JellyfinApiService {
+/**
+ * Media API Service
+ * Provides methods for interacting with the Python backend API
+ */
+export class MediaApiService {
   private getUserId(): string {
-    const userData = localStorage.getItem('jellyfin_user');
+    const userData = localStorage.getItem('user_data');
     if (!userData) throw new Error('User not logged in');
     return JSON.parse(userData).Id;
   }
 
   getImageUrl(itemId: string, imageType = 'Primary', width?: number): string {
-    const url = jellyfinClient.getServerUrl() + '/Items/' + itemId + '/Images/' + imageType;
+    const url = apiService.getServerUrl() + '/Items/' + itemId + '/Images/' + imageType;
     return width ? url + '?width=' + width + '&quality=90' : url;
   }
 
   async getLibraries(): Promise<Library[]> {
     try {
       const userId = this.getUserId();
-      const url = jellyfinClient.getServerUrl() + '/Users/' + userId + '/Views';
+      const url = apiService.getServerUrl() + '/Users/' + userId + '/Views';
       const response = await fetch(url, {
-        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+        headers: { 
+          'Authorization': `Bearer ${apiService.getAccessToken()}`,
+        },
       });
       const data = await response.json();
       return (data.Items || []).map((item: any) => ({
@@ -35,9 +41,11 @@ export class JellyfinApiService {
   async getContinueWatching(limit = 12): Promise<MediaItem[]> {
     try {
       const userId = this.getUserId();
-      const url = jellyfinClient.getServerUrl() + '/Users/' + userId + '/Items/Resume?Limit=' + limit;
+      const url = apiService.getServerUrl() + '/Users/' + userId + '/Items/Resume?Limit=' + limit;
       const response = await fetch(url, {
-        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+        headers: { 
+          'Authorization': `Bearer ${apiService.getAccessToken()}`,
+        },
       });
       const data = await response.json();
       return this.mapItems(data.Items || []);
@@ -50,9 +58,9 @@ export class JellyfinApiService {
   async getRecentlyAdded(limit = 12): Promise<MediaItem[]> {
     try {
       const userId = this.getUserId();
-      const url = jellyfinClient.getServerUrl() + '/Users/' + userId + '/Items/Latest?Limit=' + limit;
+      const url = apiService.getServerUrl() + '/Users/' + userId + '/Items/Latest?Limit=' + limit;
       const response = await fetch(url, {
-        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+        headers: { 'Authorization': `Bearer ${apiService.getAccessToken()}` },
       });
       const data = await response.json();
       return this.mapItems(data);
@@ -72,9 +80,9 @@ export class JellyfinApiService {
         SortBy: 'SortName',
         SortOrder: 'Ascending',
       });
-      const url = `${jellyfinClient.getServerUrl()}/Users/${userId}/Items?${params.toString()}`;
+      const url = `${apiService.getServerUrl()}/Users/${userId}/Items?${params.toString()}`;
       const response = await fetch(url, {
-        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+        headers: { 'Authorization': `Bearer ${apiService.getAccessToken()}` },
       });
       const data = await response.json();
       return this.mapItems(data.Items || []);
@@ -113,9 +121,9 @@ export class JellyfinApiService {
       if (options.limit) params.append('Limit', options.limit.toString());
       if (options.startIndex) params.append('StartIndex', options.startIndex.toString());
 
-      const url = `${jellyfinClient.getServerUrl()}/Users/${userId}/Items?${params.toString()}`;
+      const url = `${apiService.getServerUrl()}/Users/${userId}/Items?${params.toString()}`;
       const response = await fetch(url, {
-        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+        headers: { 'Authorization': `Bearer ${apiService.getAccessToken()}` },
       });
       const data = await response.json();
       
@@ -132,9 +140,9 @@ export class JellyfinApiService {
   async getItemById(itemId: string): Promise<MediaItem | null> {
     try {
       const userId = this.getUserId();
-      const url = `${jellyfinClient.getServerUrl()}/Users/${userId}/Items/${itemId}`;
+      const url = `${apiService.getServerUrl()}/Users/${userId}/Items/${itemId}`;
       const response = await fetch(url, {
-        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+        headers: { 'Authorization': `Bearer ${apiService.getAccessToken()}` },
       });
       
       if (!response.ok) {
@@ -152,12 +160,12 @@ export class JellyfinApiService {
   async toggleFavorite(itemId: string, isFavorite: boolean): Promise<boolean> {
     try {
       const userId = this.getUserId();
-      const url = `${jellyfinClient.getServerUrl()}/Users/${userId}/FavoriteItems/${itemId}`;
+      const url = `${apiService.getServerUrl()}/Users/${userId}/FavoriteItems/${itemId}`;
       const method = isFavorite ? 'DELETE' : 'POST';
       
       const response = await fetch(url, {
         method,
-        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+        headers: { 'Authorization': `Bearer ${apiService.getAccessToken()}` },
       });
       
       return response.ok;
@@ -174,12 +182,12 @@ export class JellyfinApiService {
   ): Promise<boolean> {
     try {
       const positionTicks = Math.floor(positionSeconds * 10000000);
-      const url = `${jellyfinClient.getServerUrl()}/Sessions/Playing/Progress`;
+      const url = `${apiService.getServerUrl()}/Sessions/Playing/Progress`;
       
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'X-Emby-Token': jellyfinClient.getAccessToken(),
+          'Authorization': `Bearer ${apiService.getAccessToken()}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -199,12 +207,12 @@ export class JellyfinApiService {
   async reportPlaybackStopped(itemId: string, positionSeconds: number): Promise<boolean> {
     try {
       const positionTicks = Math.floor(positionSeconds * 10000000);
-      const url = `${jellyfinClient.getServerUrl()}/Sessions/Playing/Stopped`;
+      const url = `${apiService.getServerUrl()}/Sessions/Playing/Stopped`;
       
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'X-Emby-Token': jellyfinClient.getAccessToken(),
+          'Authorization': `Bearer ${apiService.getAccessToken()}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -223,11 +231,11 @@ export class JellyfinApiService {
   async markAsPlayed(itemId: string): Promise<boolean> {
     try {
       const userId = this.getUserId();
-      const url = `${jellyfinClient.getServerUrl()}/Users/${userId}/PlayedItems/${itemId}`;
+      const url = `${apiService.getServerUrl()}/Users/${userId}/PlayedItems/${itemId}`;
       
       const response = await fetch(url, {
         method: 'POST',
-        headers: { 'X-Emby-Token': jellyfinClient.getAccessToken() },
+        headers: { 'Authorization': `Bearer ${apiService.getAccessToken()}` },
       });
       
       return response.ok;
@@ -254,4 +262,4 @@ export class JellyfinApiService {
   }
 }
 
-export const jellyfinApi = new JellyfinApiService();
+export const apiClient = new MediaApiService();

@@ -14,9 +14,9 @@ import {
   Stack,
   SelectChangeEvent,
 } from '@mui/material';
-import { jellyfinApi } from '@/lib/jellyfin/api';
+import { apiClient } from '@/lib/api/api';
 import { MediaCard } from '@/components/cards/MediaCard';
-import type { MediaItem } from '@/types/jellyfin';
+import type { MediaItem } from '@/types/api';
 
 export function LibraryDetail() {
   const { id } = useParams<{ id: string }>();
@@ -29,7 +29,7 @@ export function LibraryDetail() {
   // Fetch library info
   const { data: libraries } = useQuery({
     queryKey: ['libraries'],
-    queryFn: () => jellyfinApi.getLibraries(),
+    queryFn: () => apiClient.getLibraries(),
   });
 
   const currentLibrary = libraries?.find(lib => lib.Id === id);
@@ -38,7 +38,7 @@ export function LibraryDetail() {
   const { data: libraryData, isLoading } = useQuery({
     queryKey: ['libraryItems', id, sortBy, sortOrder, selectedGenres],
     queryFn: () =>
-      jellyfinApi.getLibraryItems(id!, {
+      apiClient.getLibraryItems(id!, {
         sortBy,
         sortOrder,
         genres: selectedGenres.length > 0 ? selectedGenres : undefined,

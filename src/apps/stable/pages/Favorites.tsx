@@ -2,7 +2,7 @@ import { Box, Typography, Grid, CircularProgress } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Favorite as FavoriteIcon } from '@mui/icons-material';
-import { jellyfinApi } from '@/lib/jellyfin/api';
+import { apiClient } from '@/lib/api/api';
 import { MediaCard } from '@/components/cards/MediaCard';
 
 export function Favorites() {
@@ -10,7 +10,7 @@ export function Favorites() {
 
   const { data: favorites, isLoading } = useQuery({
     queryKey: ['favorites'],
-    queryFn: () => jellyfinApi.getFavorites(100), // Get more favorites
+    queryFn: () => apiClient.getFavorites(100), // Get more favorites
   });
 
   const handleItemClick = (item: any) => {

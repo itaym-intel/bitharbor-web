@@ -16,7 +16,7 @@ import {
   FavoriteBorder as FavoriteBorderIcon,
   ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
-import { jellyfinApi } from '@/lib/jellyfin/api';
+import { apiClient } from '@/lib/api/api';
 
 export function ItemDetail() {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +26,7 @@ export function ItemDetail() {
   // Fetch the item by ID
   const { data: item, isLoading } = useQuery({
     queryKey: ['item', id],
-    queryFn: () => jellyfinApi.getItemById(id!),
+    queryFn: () => apiClient.getItemById(id!),
     enabled: !!id,
   });
 
@@ -34,7 +34,7 @@ export function ItemDetail() {
   const toggleFavoriteMutation = useMutation({
     mutationFn: async () => {
       if (!item) return false;
-      return jellyfinApi.toggleFavorite(item.Id, item.UserData?.IsFavorite || false);
+      return apiClient.toggleFavorite(item.Id, item.UserData?.IsFavorite || false);
     },
     onSuccess: () => {
       // Invalidate queries to refetch data
@@ -59,11 +59,11 @@ export function ItemDetail() {
   }
 
   const backdropUrl = item.ImageTags?.Primary
-    ? jellyfinApi.getImageUrl(item.Id, 'Backdrop', 1920)
+    ? apiClient.getImageUrl(item.Id, 'Backdrop', 1920)
     : undefined;
 
   const posterUrl = item.ImageTags?.Primary
-    ? jellyfinApi.getImageUrl(item.Id, 'Primary', 300)
+    ? apiClient.getImageUrl(item.Id, 'Primary', 300)
     : undefined;
 
   const runtime = item.RunTimeTicks
